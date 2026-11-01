@@ -19,6 +19,11 @@ FRONTEND_ORIGIN = "https://service.bleatconnect.in"
 GOOGLE_CLIENT_ID = "224398655577-vhcl3ehm13h3nv6ljhk75d6qd64el9vn.apps.googleusercontent.com"
 # Google Apps Script web app URL (deployed as "Execute as: Me, Anyone")
 APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5FrpIBjQWVpv-do6LV-qgF2jDaRZcX1Im3q7HxF2v7wMpfA8awXLWeqgRH3axg2nqOg/exec"
+# WhatsApp OTP sign-in (Meta WhatsApp Cloud API). Fill in the phone number ID.
+# WHATSAPP_ACCESS_TOKEN and OTP_PEPPER are secrets, set with `npx wrangler secret put`.
+WHATSAPP_PHONE_NUMBER_ID = ""
+WHATSAPP_OTP_TEMPLATE = "bleat_login_otp"
+WHATSAPP_OTP_LANG = "en"
 # Secret shared with Apps Script. Set with: npx wrangler secret put APPS_SCRIPT_SECRET
 # APPS_SCRIPT_SECRET is read from env as a secret, not stored here.
 

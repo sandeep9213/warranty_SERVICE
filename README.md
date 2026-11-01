@@ -100,3 +100,25 @@ apps-script/Code.gs     Google Apps Script mailer (sends from Contact@bleatconne
 
 Engineers sign in with their username. Admins sign in with their email ID.
 Translations are machine-drafted. Have a native speaker review each language before launch.
+
+## WhatsApp OTP sign-in (buyers)
+
+Buyers can sign in with Google or with a 6-digit code sent on WhatsApp (Meta WhatsApp Cloud API).
+
+One-time setup:
+
+1. In Meta Business, create an **authentication** message template named `bleat_login_otp` (language `en`).
+   Body: `{{1}} is your BLEAT login code.` Add a **Copy code** button. Wait for approval.
+2. Set the Worker secrets (never commit these):
+   - `npx wrangler secret put WHATSAPP_ACCESS_TOKEN` (permanent system-user token)
+   - `npx wrangler secret put OTP_PEPPER` (any long random string; it salts the code hashes)
+3. In `wrangler.toml`, set `WHATSAPP_PHONE_NUMBER_ID` to the sender's phone number ID.
+4. Apply `db/migrations_007_otp.sql` to the D1 database.
+
+Rules:
+- A code is valid for 5 minutes, works once, and allows 5 wrong tries.
+- At most 3 codes per number in 10 minutes, and 10 per IP per hour.
+- A code signs in to the account with that phone number only if the number was entered by staff
+  (migrated or staff-created) or was already proven by an earlier OTP. Numbers typed into a buyer's
+  own profile are not trusted for this.
+- A Google sign-in claims a staff-created or migrated account whose email matches the Google email.

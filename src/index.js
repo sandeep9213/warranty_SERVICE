@@ -129,14 +129,25 @@ async function loginWithGoogle(request, env) {
   const googleEmail = String(info.email).toLowerCase();
   const t = now();
 
-  // New buyer: prefill name and contact email from Google. Returning buyer: only refresh the Google email.
-  await env.DB.prepare(
-    `INSERT INTO users (google_sub, google_email, full_name, email, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?)
-     ON CONFLICT(google_sub) DO UPDATE SET google_email = excluded.google_email, updated_at = excluded.updated_at`
-  )
-    .bind(info.sub, googleEmail, info.name || '', googleEmail, t, t)
-    .run();
+  const bySub = await env.DB.prepare('SELECT id FROM users WHERE google_sub = ?').bind(info.sub).first();
+  if (bySub) {
+    // Returning buyer: refresh the Google email.
+    await env.DB.prepare('UPDATE users SET google_email = ?, updated_at = ? WHERE id = ?').bind(googleEmail, t, bySub.id).run();
+  } else {
+    // An account created by staff or by migration has a placeholder login key and the email the staff entered.
+    // A verified Google email with that same address claims it, so the buyer keeps their registrations.
+    const claimed = await env.DB.prepare(
+      "SELECT id FROM users WHERE google_email = ? AND google_sub LIKE 'manual:%' ORDER BY id LIMIT 1"
+    ).bind(googleEmail).first();
+    if (claimed) {
+      await env.DB.prepare('UPDATE users SET google_sub = ?, google_email = ?, updated_at = ? WHERE id = ?')
+        .bind(info.sub, googleEmail, t, claimed.id).run();
+    } else {
+      // New buyer: prefill name and contact email from Google.
+      await env.DB.prepare('INSERT INTO users (google_sub, google_email, full_name, email, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)')
+        .bind(info.sub, googleEmail, info.name || '', googleEmail, t, t).run();
+    }
+  }
 
   const user = await env.DB.prepare('SELECT id FROM users WHERE google_sub = ?').bind(info.sub).first();
 
@@ -146,6 +157,128 @@ async function loginWithGoogle(request, env) {
     .run();
 
   return json({ ok: true }, 200, { 'set-cookie': sessionCookie(token, SESSION_TTL_S) });
+}
+
+// ---------- WhatsApp OTP sign-in ----------
+
+const OTP_TTL_MS = 5 * 60 * 1000;
+const OTP_MAX_TRIES = 5;
+const OTP_PHONE_PER_10MIN = 3;
+const OTP_IP_PER_HOUR = 10;
+
+function normaliseIndianMobile(raw) {
+  let d = String(raw || '').replace(/\D/g, '');
+  if (d.length === 12 && d.startsWith('91')) d = d.slice(2);
+  if (d.length === 11 && d.startsWith('0')) d = d.slice(1);
+  return validPhone(d) ? d : null;
+}
+
+async function otpHash(env, phone, code) {
+  if (!env.OTP_PEPPER) throw new HttpError(500, 'Sign-in by WhatsApp is not configured.');
+  return sha256Hex(`${phone}:${code}:${env.OTP_PEPPER}`);
+}
+
+// Sends the code with a WhatsApp authentication template (body parameter plus copy-code button).
+async function sendWhatsAppOtp(env, phone, code) {
+  if (!env.WHATSAPP_ACCESS_TOKEN || !env.WHATSAPP_PHONE_NUMBER_ID || !env.WHATSAPP_OTP_TEMPLATE) {
+    throw new HttpError(500, 'Sign-in by WhatsApp is not configured.');
+  }
+  const r = await fetch(`https://graph.facebook.com/v21.0/${env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${env.WHATSAPP_ACCESS_TOKEN}`, 'content-type': 'application/json' },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to: '91' + phone,
+      type: 'template',
+      template: {
+        name: env.WHATSAPP_OTP_TEMPLATE,
+        language: { code: env.WHATSAPP_OTP_LANG || 'en' },
+        components: [
+          { type: 'body', parameters: [{ type: 'text', text: code }] },
+          { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: code }] },
+        ],
+      },
+    }),
+  });
+  if (!r.ok) {
+    // Log the status only; never log the phone number or the code.
+    console.log('whatsapp otp send failed, status', r.status);
+    throw new HttpError(502, 'We could not send the code on WhatsApp. Please try again.');
+  }
+}
+
+async function sendOtp(request, env) {
+  const body = await readJson(request);
+  const phone = normaliseIndianMobile(body.phone);
+  if (!phone) throw new HttpError(422, 'Please check the details.', { phone: 'Enter a 10-digit mobile number without +91.' });
+
+  const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+  const t = now();
+  const recentPhone = await env.DB.prepare('SELECT COUNT(*) AS n FROM otp_codes WHERE phone = ? AND created_at > ?')
+    .bind(phone, t - 10 * 60 * 1000).first();
+  const recentIp = await env.DB.prepare('SELECT COUNT(*) AS n FROM otp_codes WHERE ip = ? AND created_at > ?')
+    .bind(ip, t - 60 * 60 * 1000).first();
+  if (Number(recentPhone.n) >= OTP_PHONE_PER_10MIN || Number(recentIp.n) >= OTP_IP_PER_HOUR) {
+    throw new HttpError(429, 'Too many codes requested. Please wait a few minutes and try again.');
+  }
+
+  const rnd = new Uint32Array(1);
+  crypto.getRandomValues(rnd);
+  const code = String(rnd[0] % 1000000).padStart(6, '0');
+  const hash = await otpHash(env, phone, code);
+  await env.DB.prepare('INSERT INTO otp_codes (phone, code_hash, attempts, expires_at, created_at, ip) VALUES (?, ?, 0, ?, ?, ?)')
+    .bind(phone, hash, t + OTP_TTL_MS, t, ip)
+    .run();
+  await sendWhatsAppOtp(env, phone, code);
+  return json({ ok: true, expires_in: OTP_TTL_MS / 1000 });
+}
+
+async function startSession(env, userId) {
+  const token = randomToken();
+  const t = now();
+  await env.DB.prepare('INSERT INTO sessions (id, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)')
+    .bind(await sha256Hex(token), userId, t, t + SESSION_TTL_MS)
+    .run();
+  return json({ ok: true }, 200, { 'set-cookie': sessionCookie(token, SESSION_TTL_S) });
+}
+
+async function verifyOtp(request, env) {
+  const body = await readJson(request);
+  const phone = normaliseIndianMobile(body.phone);
+  const code = String(body.code || '').replace(/\s/g, '');
+  if (!phone || !/^\d{6}$/.test(code)) {
+    throw new HttpError(422, 'Please check the details.', { code: 'Enter the 6-digit code.' });
+  }
+
+  const t = now();
+  const row = await env.DB.prepare(
+    'SELECT id, code_hash, attempts, expires_at FROM otp_codes WHERE phone = ? AND consumed_at IS NULL ORDER BY id DESC LIMIT 1'
+  ).bind(phone).first();
+  if (!row || row.expires_at <= t) throw new HttpError(401, 'This code has expired. Please request a new one.');
+  if (row.attempts >= OTP_MAX_TRIES) throw new HttpError(429, 'Too many wrong codes. Please request a new one.');
+
+  await env.DB.prepare('UPDATE otp_codes SET attempts = attempts + 1 WHERE id = ?').bind(row.id).run();
+  if ((await otpHash(env, phone, code)) !== row.code_hash) throw new HttpError(401, 'The code is incorrect.');
+
+  // Single use: only the first request that marks the code as consumed can sign in.
+  const used = await env.DB.prepare('UPDATE otp_codes SET consumed_at = ? WHERE id = ? AND consumed_at IS NULL')
+    .bind(t, row.id).run();
+  if (!used.meta.changes) throw new HttpError(401, 'This code was already used. Please request a new one.');
+
+  // Link to a buyer account with this number only when the number is trusted: entered by staff (migrated or
+  // staff-created) or already proven by an earlier OTP. A number a buyer typed into their own profile is not trusted.
+  let user = await env.DB.prepare(
+    "SELECT id FROM users WHERE phone = ? AND (google_sub LIKE 'manual:%' OR phone_verified_at IS NOT NULL) ORDER BY id LIMIT 1"
+  ).bind(phone).first();
+  if (user) {
+    await env.DB.prepare('UPDATE users SET phone_verified_at = ?, updated_at = ? WHERE id = ?').bind(t, t, user.id).run();
+  } else {
+    await env.DB.prepare("INSERT INTO users (google_sub, google_email, full_name, phone, phone_verified_at, created_at, updated_at) VALUES (?, '', '', ?, ?, ?, ?)")
+      .bind('phone:' + phone, phone, t, t, t)
+      .run();
+    user = await env.DB.prepare('SELECT id FROM users WHERE google_sub = ?').bind('phone:' + phone).first();
+  }
+  return startSession(env, user.id);
 }
 
 async function logout(request, env) {
@@ -209,10 +342,11 @@ async function saveProfile(request, env) {
   await env.DB.prepare(
     `UPDATE users SET full_name = ?, email = ?, phone = ?, address_line1 = ?, address_line2 = ?,
        city = ?, state = ?, country = ?, postal_code = ?,
-       consent_at = COALESCE(consent_at, ?), updated_at = ?
+       consent_at = COALESCE(consent_at, ?), updated_at = ?,
+       phone_verified_at = CASE WHEN phone = ? THEN phone_verified_at ELSE NULL END
      WHERE id = ?`
   )
-    .bind(d.full_name, d.email, d.phone, d.address_line1, d.address_line2, d.city, d.state, d.country, d.postal_code, t, t, userId)
+    .bind(d.full_name, d.email, d.phone, d.address_line1, d.address_line2, d.city, d.state, d.country, d.postal_code, t, t, d.phone, userId)
     .run();
 
   return json({ ok: true });
@@ -525,6 +659,8 @@ async function route(request, env, ctx, url) {
   const p = url.pathname;
 
   if (m === 'POST' && p === '/api/auth/google') return loginWithGoogle(request, env);
+  if (m === 'POST' && p === '/api/auth/otp/send') return sendOtp(request, env);
+  if (m === 'POST' && p === '/api/auth/otp/verify') return verifyOtp(request, env);
   if (m === 'POST' && p === '/api/auth/logout') return logout(request, env);
   if (m === 'GET' && p === '/api/me') return me(request, env);
   if (m === 'PUT' && p === '/api/profile') return saveProfile(request, env);
