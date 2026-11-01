@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BLEAT Service and Warranty</title>
+<script src="https://accounts.google.com/gsi/client" async defer onload="googleReady()"></script>
+<style>
+:root{--bg:#f6f7f9;--card:#ffffff;--text:#1d2330;--muted:#6b7280;--brand:#0b6cff;--err:#c62828;--line:#dfe3ea;--ok:#2e7d32}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1218;--card:#171c25;--text:#e8ebf0;--muted:#9aa3b2;--brand:#4d9bff;--err:#ff6b6b;--line:#2a3140;--ok:#66bb6a}}
+:root[data-theme="dark"]{--bg:#0f1218;--card:#171c25;--text:#e8ebf0;--muted:#9aa3b2;--brand:#4d9bff;--err:#ff6b6b;--line:#2a3140;--ok:#66bb6a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+header strong{font-size:16px}
+main{max-width:720px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+h2{margin:0 0 6px;font-size:20px}
+h3{margin:0 0 8px;font-size:16px}
+label{display:block;font-size:14px;margin:12px 0 4px;color:var(--muted)}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--text)}
+textarea{min-height:110px;resize:vertical}
+button{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font:inherit;cursor:pointer;margin-top:12px}
+button.ghost{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+button:disabled{opacity:.6;cursor:wait}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+.muted{color:var(--muted);font-size:14px}
+.err{color:var(--err);font-size:14px;margin:10px 0 0}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;color:var(--text)}
+.check input{width:auto;margin-top:4px}
+.item{border-top:1px solid var(--line);padding:12px 0}
+.item:first-child{border-top:0}
+.pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;border:1px solid var(--line);margin-left:6px}
+.pill.pending_engineer{color:var(--brand)}
+.pill.pending_buyer{color:var(--err)}
+.pill.closed{color:var(--ok)}
+.hint{background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--muted);margin-top:8px}
+.terms{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:14px;margin-top:12px}
+.terms ul{margin:6px 0 0 18px;padding:0}
+.hidden{display:none!important}
+.logo{height:32px;width:auto;display:block;order:1}
+.hdr-top,.hdr-bottom,.hdr-actions{display:contents}
+.hdr-mid{display:none}
+header strong{order:2}
+#nav{order:3}
+#lang-slot{order:4}
+#logout{order:5}
+.nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.nav button{margin-top:0;padding:8px 12px;display:inline-flex;align-items:center;gap:6px}
+.nav svg{width:16px;height:16px}
+.details{margin:12px 0 0}
+.details dd{margin:2px 0 0;font-size:15px}
+.toast{position:fixed;left:16px;right:16px;bottom:16px;max-width:560px;margin:auto;background:#1d2330;color:#fff;padding:12px 14px;border-radius:8px;font-size:14px}
+
+/* ---------- Mobile layout ---------- */
+input[type=date]{-webkit-appearance:none;appearance:none;min-width:0}
+input,select,textarea{max-width:100%}
+img{max-width:100%;height:auto}
+.item,.details dd{overflow-wrap:anywhere}
+button.small{margin-top:8px;padding:8px 14px;min-height:40px}
+#edit-profile{width:auto;margin-top:0}
+@media (max-width:640px){
+  header{display:block;padding:10px 12px}
+  .hdr-top,.hdr-bottom,.hdr-actions{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .hdr-bottom{margin-top:8px}
+  .hdr-mid{display:block;flex:1 1 auto;min-width:0;text-align:center;font-size:13px;font-weight:600;line-height:1.2}
+  .hdr-actions{gap:6px;flex:0 0 auto}
+  header strong{display:none}
+  #lang-slot select{width:auto;min-height:36px;padding:4px 6px;font-size:14px}
+  #logout{margin-top:0;min-height:36px;padding:6px 10px;font-size:13px;width:auto}
+  #nav{display:flex;flex-wrap:nowrap;gap:4px;min-width:0;flex:1 1 auto;justify-content:center;overflow-x:auto;scrollbar-width:none}
+  #nav::-webkit-scrollbar{display:none}
+  .nav button{flex:0 0 auto;margin-top:0;min-height:36px;font-size:13px;padding:6px 10px;white-space:nowrap}
+  main{padding:12px}
+  .card{padding:16px;border-radius:10px}
+  h2{font-size:18px}
+  input,select,textarea{font-size:16px;min-height:44px}
+  textarea{min-height:120px}
+  form button,#show-product{width:100%;min-height:46px;font-size:16px}
+  button.small{width:auto}
+  .check{align-items:center}
+  .check input{margin-top:0;min-width:20px;min-height:20px}
+  .toast{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom))}
+  .row{gap:0}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-top">
+    <img class="logo" src="email-banner.png" alt="BLEAT" height="32">
+    <span class="hdr-mid">Service and Warranty</span>
+    <div class="hdr-actions">
+      <span id="lang-slot"></span>
+      <button id="logout" class="ghost" type="button">Sign out</button>
+    </div>
+  </div>
+  <div class="hdr-bottom">
+    <strong>BLEAT Service and Warranty</strong>
+    <div id="nav" class="nav hidden">
+      <button id="nav-products" class="ghost" type="button">My products</button>
+      <button id="nav-service" class="ghost" type="button">Service requests</button>
+      <button id="btn-profile" class="ghost" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>My profile</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Sign in -->
+  <section id="view-login" class="card hidden">
+    <h2>Sign in</h2>
+    <p class="muted">Sign in with your Google account to register your BLEAT product and raise a service request.</p>
+    <div id="gsi-button" style="margin-top:16px"></div>
+    <p class="err" id="login-err"></p>
+  </section>
+
+  <!-- My profile (read-only view) -->
+  <section id="view-me" class="card hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <h2>My profile</h2>
+      <button id="edit-profile" type="button" class="ghost">Edit</button>
+    </div>
+    <div id="me-details" class="details"></div>
+  </section>
+
+  <!-- Complete profile (point 2) -->
+  <section id="view-profile" class="card hidden">
+    <h2 id="profile-title">Your details</h2>
+    <p class="muted">These details are needed to register products and raise service requests. All fields are mandatory.</p>
+    <form id="profile-form" novalidate>
+      <label for="p-name">Name of customer *</label>
+      <input id="p-name" name="full_name" autocomplete="name">
+
+      <div class="row">
+        <div>
+          <label for="p-email">Email ID *</label>
+          <input id="p-email" name="email" type="email" autocomplete="email">
+        </div>
+        <div>
+          <label for="p-phone">Registered phone no. * (10 digits, without +91)</label>
+          <input id="p-phone" name="phone" type="tel" inputmode="numeric" maxlength="10" data-digits placeholder="10 digits, without +91" autocomplete="tel-national">
+        </div>
+      </div>
+
+      <label for="p-a1">Address line 1 *</label>
+      <input id="p-a1" name="address_line1" autocomplete="address-line1">
+
+      <label for="p-a2">Address line 2</label>
+      <input id="p-a2" name="address_line2" autocomplete="address-line2">
+
+      <div class="row">
+        <div>
+          <label for="p-city">City *</label>
+          <input id="p-city" name="city" autocomplete="address-level2">
+        </div>
+        <div>
+          <label for="p-state">State *</label>
+          <input id="p-state" name="state" autocomplete="address-level1">
+        </div>
+        <div>
+          <label for="p-country">Country *</label>
+          <input id="p-country" name="country" autocomplete="country-name">
+        </div>
+        <div>
+          <label for="p-postal">Postal code *</label>
+          <input id="p-postal" name="postal_code" inputmode="numeric" maxlength="10" data-digits autocomplete="postal-code">
+        </div>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" name="consent">
+        <span>I agree that BLEAT may store these details to manage my product registrations and warranty service.</span>
+      </label>
+
+      <p class="err" id="profile-err"></p>
+      <button type="submit" id="profile-submit">Save and continue</button>
+      <button type="button" id="cancel-edit" class="ghost hidden">Cancel</button>
+    </form>
+  </section>
+
+  <!-- Main portal -->
+  <section id="view-products" class="hidden">
+
+    <div class="card">
+      <h2>My products</h2>
+      <div id="product-list"></div>
+      <button id="show-product" class="ghost" type="button">+ Register a product</button>
+    </div>
+
+    <!-- Register product (point 4) -->
+    <form id="product-form" class="card hidden" novalidate>
+      <h2>Register a product</h2>
+      <p class="muted">Fill in the details exactly as they appear on your bill.</p>
+
+      <label for="f-category">Product category *</label>
+      <select id="f-category" name="category"></select>
+
+      <label for="f-model">Model name *</label>
+      <input id="f-model" name="model_name">
+
+      <label for="f-date">Date of purchase *</label>
+      <input id="f-date" name="purchase_date" type="date">
+
+      <label for="f-place">Place of purchase *</label>
+      <select id="f-place" name="place_of_purchase"></select>
+
+      <div id="order-wrap" class="hidden">
+        <label for="f-order">Order no. *</label>
+        <input id="f-order" name="order_no" placeholder="As shown on your order confirmation">
+      </div>
+
+      <div id="dealer-wrap" class="hidden">
+        <label for="f-dealer" id="dealer-label">Dealer name *</label>
+        <input id="f-dealer" name="dealer_name">
+      </div>
+
+      <label for="f-serial">Serial no. of product *</label>
+      <input id="f-serial" name="serial_no">
+      <div class="hint" id="serial-hint"></div>
+
+      <div class="row">
+        <div>
+          <label for="f-email">Email ID *</label>
+          <input id="f-email" name="reg_email" type="email">
+        </div>
+        <div>
+          <label for="f-phone">Phone no. * (10 digits, without +91)</label>
+          <input id="f-phone" name="reg_phone" type="tel" inputmode="numeric" maxlength="10" data-digits placeholder="10 digits, without +91">
+        </div>
+      </div>
+
+      <label for="f-bill">Photo of the bill *</label>
+      <input id="f-bill" type="file" accept="image/*">
+      <p class="muted" style="margin:6px 0 0">Take a photo of the bill with your phone camera, or choose one from your gallery. It is compressed automatically before upload.</p>
+      <p class="muted" id="bill-status" style="margin:6px 0 0"></p>
+      <img id="bill-preview" class="hidden" alt="Bill photo preview" style="display:block;max-width:100%;max-height:260px;border-radius:8px;margin-top:8px;border:1px solid var(--line)">
+
+      <p class="err" id="product-err"></p>
+      <button type="submit">Register product</button>
+      <button type="button" id="cancel-product" class="ghost">Cancel</button>
+    </form>
+
+  </section>
+
+  <!-- Service requests page (points 6–10, 15) -->
+  <section id="view-service" class="hidden">
+
+    <!-- Service request (points 6–10, 15) -->
+    <div class="card">
+      <h2>Raise a service request</h2>
+      <form id="ticket-form" novalidate>
+        <label for="t-product">Product *</label>
+        <select id="t-product" name="product_id"></select>
+
+        <label for="t-issue">Describe the issue *</label>
+        <textarea id="t-issue" name="issue_text" placeholder="What is happening with the product?"></textarea>
+
+        <div class="row">
+          <div>
+            <label for="t-wa">WhatsApp number * (10 digits, without +91)</label>
+            <input id="t-wa" name="whatsapp" type="tel" inputmode="numeric" maxlength="10" data-digits placeholder="10 digits, without +91">
+          </div>
+          <div>
+            <label for="t-email">Email ID *</label>
+            <input id="t-email" name="contact_email" type="email">
+          </div>
+        </div>
+
+        <div class="terms">
+          <strong>Warranty terms</strong>
+          <ul>
+            <li><strong>Forward and return shipping charges are to be paid by you, the buyer.</strong></li>
+            <li>If the courier is delayed, BLEAT is not responsible for the delay. We can arrange a replacement once the product is delivered back to us.</li>
+          </ul>
+        </div>
+
+        <label class="check">
+          <input type="checkbox" name="tc_accepted">
+          <span>I have read and accept the warranty terms above.</span>
+        </label>
+
+        <p class="err" id="ticket-err"></p>
+        <button type="submit">Submit request</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>My service requests</h2>
+      <div id="ticket-list"></div>
+    </div>
+
+    <div class="card hidden" id="ticket-detail"></div>
+
+  </section>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="i18n.js"></script>
+<script src="i18n-buyer.js"></script>
+<script src="i18n-buyer-extra.js"></script>
+<script src="i18n-buyer-bill.js"></script>
+<script src="i18n-buyer-title.js"></script>
+<script src="i18n-cols.js"></script>
+<script>
+const API = 'https://api.bleatconnect.in';      // Worker API domain
+const GOOGLE_CLIENT_ID = '224398655577-vhcl3ehm13h3nv6ljhk75d6qd64el9vn.apps.googleusercontent.com';
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const STATUS = {
+  pending_engineer: 'Under review by our service team',
+  pending_buyer: 'Waiting for your reply',
+  closed: 'Closed',
+};
+
+async function api(path, opts = {}) {
+  const headers = opts.body ? { 'content-type': 'application/json' } : {};
+  const res = await fetch(API + path, { credentials: 'include', ...opts, headers });
+  let data = {};
+  try { data = await res.json(); } catch (_) {}
+  if (!res.ok) {
+    const err = new Error(data.error || 'Request failed.');
+    err.fields = data.fields || {};
+    throw err;
+  }
+  return data;
+}
+
+const errText = (err) => (err.fields && Object.keys(err.fields).length ? Object.values(err.fields).join(' ') : err.message);
+const formData = (form) => Object.fromEntries(new FormData(form));
+
+// Numeric-only fields: strip anything that isn't a digit as the user types.
+document.addEventListener('input', (e) => {
+  if (e.target.matches('[data-digits]')) e.target.value = e.target.value.replace(/\D/g, '');
+});
+
+function showView(id) {
+  ['view-login', 'view-profile', 'view-products', 'view-service', 'view-me'].forEach((v) => $('#' + v).classList.toggle('hidden', v !== id));
+}
+
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 4500);
+}
+
+// ---------- Google sign-in ----------
+let gsiLoaded = false;
+function googleReady() {
+  if (gsiLoaded) return;
+  gsiLoaded = true;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: async (resp) => {
+      try {
+        await api('/api/auth/google', { method: 'POST', body: JSON.stringify({ credential: resp.credential }) });
+        await start();
+      } catch (err) {
+        $('#login-err').textContent = errText(err);
+      }
+    },
+  });
+  google.accounts.id.renderButton($('#gsi-button'), { theme: 'outline', size: 'large', text: 'continue_with', width: 280 });
+}
+
+// ---------- Startup ----------
+async function start() {
+  const me = await api('/api/me').catch(() => ({ authenticated: false }));
+  signedIn = !!me.authenticated;
+  if (signedIn) {
+    // The language saved on the account wins. A choice made before sign-in is saved to the account.
+    const server = me.user?.lang || 'en';
+    const local = savedLang();
+    if (server !== 'en') {
+      if (server !== local) { saveLang(server); location.reload(); return; }
+    } else if (local !== 'en') {
+      const ok = await api('/api/me/language', { method: 'PUT', body: JSON.stringify({ lang: local }) }).then(() => true, () => false);
+      if (ok) { location.reload(); return; }
+    }
+  }
+  if (!me.authenticated) {
+    $('#nav').classList.add('hidden');
+    $('#logout').classList.add('hidden');
+    showView('view-login');
+    return;
+  }
+  $('#nav').classList.remove('hidden');
+  $('#logout').classList.remove('hidden');
+  if (!me.profile_complete) {
+    fillProfile(me.user);
+    showView('view-profile');
+    return;
+  }
+  await loadApp();
+  showView('view-products');
+}
+
+function fillProfile(u) {
+  const f = $('#profile-form');
+  for (const k of ['full_name', 'email', 'phone', 'address_line1', 'address_line2', 'city', 'state', 'country', 'postal_code']) {
+    const el = f.elements[k];
+    if (el && u[k]) el.value = u[k];
+  }
+}
+
+// ---------- Profile form (point 2) ----------
+$('#profile-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const btn = f.querySelector('button');
+  btn.disabled = true;
+  try {
+    const body = { ...formData(f), consent: f.elements.consent.checked };
+    await api('/api/profile', { method: 'PUT', body: JSON.stringify(body) });
+    if (editingProfile) {
+      exitEdit();
+      toast('Your details were updated.');
+      await openMe();
+    } else {
+      await start();
+    }
+  } catch (err) {
+    $('#profile-err').textContent = errText(err);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// ---------- Load app data ----------
+async function loadApp() {
+  const [products, tickets, cats, places] = await Promise.all([
+    api('/api/products'),
+    api('/api/tickets'),
+    api('/api/dropdowns?list=product_category'),
+    api('/api/dropdowns?list=place_of_purchase'),
+  ]);
+
+  // Dropdowns come from the database; default is set in the DB (Dashcamera).
+  $('#f-category').innerHTML = cats.options
+    .map((o) => `<option value="${esc(o.value)}" ${o.is_default ? 'selected' : ''}>${esc(o.value)}</option>`)
+    .join('');
+  $('#f-place').innerHTML = '<option value="">Select place of purchase</option>' +
+    places.options.map((o) => `<option value="${esc(o.value)}">${esc(o.value)}</option>`).join('');
+
+  renderProducts(products.products);
+  renderTickets(tickets.tickets);
+}
+
+function renderProducts(list) {
+  $('#product-list').innerHTML = list.length
+    ? list.map((p) => `
+        <div class="item">
+          <strong>${esc(p.model_name)}</strong> <span class="muted">(${esc(p.category)})</span><br>
+          <span class="muted">${esc(t('b_bought_from').replace('{date}', p.purchase_date).replace('{place}', p.place_of_purchase))}${p.dealer_name ? ' – ' + esc(p.dealer_name) : ''}${p.order_no ? ' · ' + esc(t('b_order_no').replace('{n}', p.order_no)) : ''}</span><br>
+          <span class="muted">${esc(t('b_serial_no').replace('{n}', p.serial_no))}</span><br>
+          <span class="muted">${esc(t('b_registered_on'))}: ${esc(new Date(p.created_at).toLocaleDateString('en-IN'))}</span>
+        </div>`).join('')
+    : '<p class="muted">No products registered yet.</p>';
+
+  $('#t-product').innerHTML = list.length
+    ? list.map((p) => `<option value="${p.id}">${esc(p.model_name)} (${esc(p.category)})</option>`).join('')
+    : `<option value="">${esc(t('b_register_first'))}</option>`;
+}
+
+function renderTickets(list) {
+  $('#ticket-list').innerHTML = list.length
+    ? list.map((t) => `
+        <div class="item">
+          <strong>${esc(t.ticket_no)}</strong>
+          <span class="pill ${esc(t.status)}">${esc(STATUS[t.status] || t.status)}</span><br>
+          <span class="muted">${esc(t.model_name)} · ${new Date(t.created_at).toLocaleDateString('en-IN')}</span>
+          <div style="margin-top:4px">${esc(t.issue_text)}</div>
+          <button type="button" class="small" style="margin-top:6px" data-open-ticket="${t.id}">${t.status === 'pending_buyer' ? 'Reply now' : 'View conversation'}</button>
+        </div>`).join('')
+    : '<p class="muted">No service requests yet.</p>';
+}
+
+// ---------- Bill photo: compressed in the browser before upload ----------
+const BILL_TARGET_BYTES = 600 * 1024;   // about 820 KB as base64, under the server limit
+let billData = null;                    // data URL of the compressed bill photo
+
+async function decodeBill(file) {
+  try {
+    return await createImageBitmap(file, { imageOrientation: 'from-image' });
+  } catch (_) {
+    try { return await createImageBitmap(file); } catch (_2) { throw new Error(t('b_bill_type')); }
+  }
+}
+
+async function compressBill(file) {
+  if (!file.type.startsWith('image/')) throw new Error(t('b_bill_type'));
+  const bmp = await decodeBill(file);
+  try {
+    // Largest side 1600 px first, then 1200 px; JPEG quality steps down until the file fits.
+    for (const side of [1600, 1200]) {
+      const scale = Math.min(1, side / Math.max(bmp.width, bmp.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(bmp.width * scale);
+      canvas.height = Math.round(bmp.height * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+      for (const quality of [0.8, 0.65, 0.5]) {
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+        if (blob && blob.size <= BILL_TARGET_BYTES) return blob;
+      }
+    }
+  } finally {
+    bmp.close();
+  }
+  throw new Error(t('b_bill_too_large'));
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = () => reject(new Error(t('b_bill_type')));
+    r.readAsDataURL(blob);
+  });
+}
+
+function resetBill() {
+  billData = null;
+  $('#f-bill').value = '';
+  $('#bill-preview').classList.add('hidden');
+  $('#bill-status').textContent = '';
+}
+
+$('#f-bill').addEventListener('change', async (e) => {
+  const input = e.target;
+  const file = input.files[0];
+  resetBill();
+  $('#product-err').textContent = '';
+  if (!file) return;
+  $('#bill-status').textContent = t('b_bill_compressing');
+  try {
+    const blob = await compressBill(file);
+    billData = await blobToDataUrl(blob);
+    $('#bill-preview').src = billData;
+    $('#bill-preview').classList.remove('hidden');
+    $('#bill-status').textContent = t('b_bill_ready').replace('{kb}', Math.round(blob.size / 1024));
+  } catch (err) {
+    resetBill();
+    $('#product-err').textContent = err.message;
+  }
+});
+
+// ---------- Register product (points 4–5) ----------
+$('#show-product').addEventListener('click', () => $('#product-form').classList.remove('hidden'));
+$('#cancel-product').addEventListener('click', () => $('#product-form').classList.add('hidden'));
+$('#f-place').addEventListener('change', (e) => {
+  const isDealer = e.target.value === 'Offline Dealer';
+  const isPortal = e.target.value === 'Other Online Portal';
+  const isOnline = e.target.value !== '' && !isDealer;
+  $('#dealer-wrap').classList.toggle('hidden', !isDealer && !isPortal);
+  $('#dealer-label').textContent = isPortal ? 'Portal name and details *' : 'Dealer name *';
+  $('#f-dealer').required = isDealer || isPortal;
+  $('#order-wrap').classList.toggle('hidden', !isOnline);
+});
+
+$('#product-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const btn = f.querySelector('button[type=submit]');
+  btn.disabled = true;
+  $('#product-err').textContent = '';
+  try {
+    if (!billData) throw new Error(t('b_bill_required'));
+    await api('/api/products', { method: 'POST', body: JSON.stringify({ ...formData(f), bill: billData }) });
+    f.reset();
+    resetBill();
+    $('#dealer-wrap').classList.add('hidden');
+    $('#order-wrap').classList.add('hidden');
+    f.classList.add('hidden');
+    toast('Product registered. A confirmation email is on its way. Please keep your bill safe.');
+    await loadApp();
+  } catch (err) {
+    $('#product-err').textContent = errText(err);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// ---------- Service request (points 6–10) ----------
+$('#ticket-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const btn = f.querySelector('button[type=submit]');
+  btn.disabled = true;
+  $('#ticket-err').textContent = '';
+  try {
+    const body = { ...formData(f), tc_accepted: f.elements.tc_accepted.checked };
+    const res = await api('/api/tickets', { method: 'POST', body: JSON.stringify(body) });
+    f.reset();
+    toast(t('b_toast_request_created').replace('{n}', res.ticket_no));
+    await loadApp();
+  } catch (err) {
+    $('#ticket-err').textContent = errText(err);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// ---------- Conversation and buyer reply ----------
+async function openTicket(id) {
+  const box = $('#ticket-detail');
+  box.classList.remove('hidden');
+  box.innerHTML = '<p class="muted">Loading…</p>';
+  try {
+    const { ticket, comments } = await api('/api/tickets/' + id);
+    box.innerHTML = renderThread(ticket, comments);
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    box.innerHTML = '<p class="err">' + esc(errText(err)) + '</p>';
+  }
+}
+
+function renderThread(t, comments) {
+  const thread = comments.length
+    ? comments.map((c) => `
+        <div class="item">
+          <strong>${esc(c.from)}</strong> <span class="muted">${new Date(c.created_at).toLocaleString('en-IN')}</span>
+          <div style="margin-top:4px;white-space:pre-wrap">${esc(c.body)}</div>
+        </div>`).join('')
+    : '<p class="muted">No messages yet.</p>';
+
+  let action;
+  if (t.status === 'pending_buyer') {
+    action = `
+      <form id="reply-form" data-ticket="${t.id}" style="margin-top:12px">
+        <label for="reply-body">Our service team needs more information from you. Please reply below.</label>
+        <textarea id="reply-body" name="body" required minlength="2" maxlength="2000" placeholder="Type your reply"></textarea>
+        <p class="err" id="reply-err"></p>
+        <button type="submit">Send reply</button>
+      </form>`;
+  } else if (t.status === 'closed') {
+    action = '<p class="muted" style="margin-top:12px">This request is closed. To raise a new issue, please submit a new service request.</p>';
+  } else {
+    action = '<p class="muted" style="margin-top:12px">Our service team is reviewing this request. You will get an email when there is an update.</p>';
+  }
+
+  return `
+    <h2>${esc(t.ticket_no)} <span class="pill ${esc(t.status)}">${esc(STATUS[t.status] || t.status)}</span></h2>
+    <p class="muted">${esc(t.model_name)} · ${esc(t.category)}</p>
+    <div style="margin:8px 0"><strong>Your issue</strong><div style="white-space:pre-wrap">${esc(t.issue_text)}</div></div>
+    <h3>Conversation</h3>
+    ${thread}
+    ${action}
+    <button type="button" class="small" style="margin-top:12px" data-close-ticket>Close</button>`;
+}
+
+document.addEventListener('click', (e) => {
+  const open = e.target.closest('[data-open-ticket]');
+  if (open) return openTicket(open.dataset.openTicket);
+  if (e.target.closest('[data-close-ticket]')) $('#ticket-detail').classList.add('hidden');
+});
+
+document.addEventListener('submit', async (e) => {
+  if (e.target.id !== 'reply-form') return;
+  e.preventDefault();
+  const f = e.target;
+  const btn = f.querySelector('button[type=submit]');
+  const err = $('#reply-err');
+  btn.disabled = true;
+  err.textContent = '';
+  try {
+    await api('/api/tickets/' + f.dataset.ticket + '/reply', { method: 'POST', body: JSON.stringify({ body: f.elements.body.value.trim() }) });
+    toast('Reply sent. Our service team will review it.');
+    await loadApp();
+    await openTicket(f.dataset.ticket);
+  } catch (ex) {
+    err.textContent = errText(ex);
+    btn.disabled = false;
+  }
+});
+
+// ---------- My profile ----------
+let editingProfile = false;
+const PROFILE_VIEW_FIELDS = [
+  ['full_name', 'Name of customer'],
+  ['email', 'Email ID'],
+  ['phone', 'Registered phone no.'],
+  ['address_line1', 'Address line 1'],
+  ['address_line2', 'Address line 2'],
+  ['city', 'City'],
+  ['state', 'State'],
+  ['country', 'Country'],
+  ['postal_code', 'Postal code'],
+  ['google_email', 'Google sign-in email'],
+];
+
+async function openMe() {
+  const me = await api('/api/me');
+  $('#me-details').innerHTML = PROFILE_VIEW_FIELDS.map(([k, label]) => {
+    const value = me.user[k] ? esc(me.user[k]) : '<span class="muted">Not provided</span>';
+    return `<div class="item"><div class="muted" style="font-size:13px">${esc(label)}</div><div>${value}</div></div>`;
+  }).join('');
+  showView('view-me');
+}
+
+async function openProfileEdit() {
+  const me = await api('/api/me');
+  editingProfile = true;
+  fillProfile(me.user);
+  $('#profile-title').textContent = 'Edit your details';
+  $('#profile-submit').textContent = 'Save changes';
+  $('#cancel-edit').classList.remove('hidden');
+  $('#profile-form').elements.consent.parentElement.classList.add('hidden');
+  showView('view-profile');
+}
+
+function exitEdit() {
+  editingProfile = false;
+  $('#profile-title').textContent = 'Your details';
+  $('#profile-submit').textContent = 'Save and continue';
+  $('#cancel-edit').classList.add('hidden');
+  $('#profile-form').elements.consent.parentElement.classList.remove('hidden');
+}
+
+$('#btn-profile').addEventListener('click', () => openMe().catch((err) => toast(errText(err))));
+$('#edit-profile').addEventListener('click', () => openProfileEdit().catch((err) => toast(errText(err))));
+$('#cancel-edit').addEventListener('click', async () => {
+  exitEdit();
+  await openMe();
+});
+
+// ---------- Page navigation ----------
+$('#nav-products').addEventListener('click', () => showView('view-products'));
+$('#nav-service').addEventListener('click', () => showView('view-service'));
+
+// ---------- Purchase date: open the calendar, no future dates ----------
+const purchaseDate = $('#f-date');
+const todayLocal = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+purchaseDate.max = todayLocal;
+const openCalendar = () => { try { purchaseDate.showPicker(); } catch (_) {} };
+purchaseDate.addEventListener('click', openCalendar);
+purchaseDate.addEventListener('focus', openCalendar);
+
+// ---------- Sign out ----------
+$('#logout').addEventListener('click', async () => {
+  await api('/api/auth/logout', { method: 'POST' }).catch(() => {});
+  start();
+});
+
+// Google script may load before or after this line.
+// ---------- Language ----------
+// English text on the page is swapped for the chosen language. Works on static and rendered text alike.
+let MAP = new Map();
+let signedIn = false;
+function savedLang() { try { return localStorage.getItem('bleat_lang') || 'en'; } catch (_) { return 'en'; } }
+function saveLang(code) { try { localStorage.setItem('bleat_lang', code); } catch (_) {} }
+function buildMap() {
+  const lang = currentLang();
+  const m = new Map();
+  if (lang === 'en') return m;
+  for (const [k, v] of Object.entries(I18N.en)) {
+    if (!k.startsWith('b_')) continue;
+    const tr = I18N[lang] && I18N[lang][k];
+    if (tr) m.set(String(v).trim(), tr);
+  }
+  return m;
+}
+function xlate(node) {
+  if (node.nodeType === 3) {
+    const v = node.nodeValue, k = v.trim();
+    if (k && MAP.has(k)) node.nodeValue = v.replace(k, () => MAP.get(k));
+    return;
+  }
+  if (node.nodeType !== 1 || node.tagName === 'SCRIPT' || node.tagName === 'STYLE') return;
+  const ph = node.getAttribute('placeholder');
+  if (ph && MAP.has(ph.trim())) node.setAttribute('placeholder', MAP.get(ph.trim()));
+  for (const c of node.childNodes) xlate(c);
+}
+function translatePage() {
+  MAP = buildMap();
+  document.documentElement.lang = currentLang();
+  document.title = t('b_app_title');
+  const hint = document.getElementById('serial-hint');
+  if (hint) hint.textContent = t('b_hint_serial');
+  xlate(document.body);
+}
+new MutationObserver((records) => {
+  for (const r of records) {
+    if (r.type === 'childList') r.addedNodes.forEach((n) => xlate(n));
+    else xlate(r.target);
+  }
+}).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['placeholder'] });
+
+function buildLangBox() {
+  const sel = document.createElement('select');
+  sel.setAttribute('aria-label', t('b_lang_label'));
+  sel.style.width = 'auto';
+  for (const l of I18N_LANGS) {
+    const o = document.createElement('option');
+    o.value = l.code; o.textContent = l.label; o.selected = l.code === currentLang();
+    sel.appendChild(o);
+  }
+  sel.addEventListener('change', async () => {
+    saveLang(sel.value);
+    if (signedIn) await api('/api/me/language', { method: 'PUT', body: JSON.stringify({ lang: sel.value }) }).catch(() => {});
+    location.reload();
+  });
+  $('#lang-slot').appendChild(sel);
+}
+
+// Google script may load before or after this line.
+document.addEventListener("DOMContentLoaded", () => { translatePage(); buildLangBox(); start(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# Local tooling and build output
+node_modules/
+.wrangler/
+.DS_Store
+.dev.vars
+.env
+.env.*
+
+# Bootstrap admin SQL (contains credentials; keep out of the repo)
+tools/first-admin.sql
+
+# Customer data exports (personal details; never commit)
+db/migration_import_registrations.sql
+*.csv

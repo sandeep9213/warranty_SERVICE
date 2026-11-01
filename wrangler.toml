@@ -1,0 +1,27 @@
+name = "bleat-portal-api"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+routes = [
+  { pattern = "api.bleatconnect.in", custom_domain = true }
+]
+
+# Custom domain for the API, e.g. api.bleatconnect.in (set in Cloudflare dashboard,
+# or add a routes entry). It must share the parent domain with the portal frontend
+# so the session cookie works.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "bleat-service"
+database_id = "7bce773d-3de9-489e-8f28-25651ebc54c8"
+
+[vars]
+FRONTEND_ORIGIN = "https://service.bleatconnect.in"
+GOOGLE_CLIENT_ID = "224398655577-vhcl3ehm13h3nv6ljhk75d6qd64el9vn.apps.googleusercontent.com"
+# Google Apps Script web app URL (deployed as "Execute as: Me, Anyone")
+APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5FrpIBjQWVpv-do6LV-qgF2jDaRZcX1Im3q7HxF2v7wMpfA8awXLWeqgRH3axg2nqOg/exec"
+# Secret shared with Apps Script. Set with: npx wrangler secret put APPS_SCRIPT_SECRET
+# APPS_SCRIPT_SECRET is read from env as a secret, not stored here.
+
+# Workers AI: translation between buyers' languages and English
+[ai]
+binding = "AI"

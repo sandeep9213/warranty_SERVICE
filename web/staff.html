@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BLEAT Service Staff Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&family=Noto+Sans+Devanagari&family=Noto+Sans+Tamil&family=Noto+Sans+Telugu&family=Noto+Sans+Malayalam&family=Noto+Sans+Bengali&family=Noto+Sans+Kannada&family=Noto+Sans+Gujarati&family=Noto+Sans+Gurmukhi&family=Noto+Sans+Oriya&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f6f8; --card: #ffffff; --ink: #1d2330; --muted: #6b7280; --line: #e3e6ea;
+  --brand: #0b5cad; --danger: #b42318; --ok: #067647;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141b; --card: #171e28; --ink: #e8ecf2; --muted: #9aa4b2; --line: #2a3340;
+    --brand: #5aa9ff; --danger: #ff8a80; --ok: #6ce9a6;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141b; --card: #171e28; --ink: #e8ecf2; --muted: #9aa4b2; --line: #2a3340;
+  --brand: #5aa9ff; --danger: #ff8a80; --ok: #6ce9a6;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.5 "Noto Sans", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Malayalam", "Noto Sans Bengali", "Noto Sans Kannada", "Noto Sans Gujarati", "Noto Sans Gurmukhi", "Noto Sans Oriya", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+header { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--card); border-bottom: 1px solid var(--line); }
+.brand { font-weight: 600; font-size: 17px; }
+.hdr-right { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px; background: var(--card); border-bottom: 1px solid var(--line); }
+main { max-width: 1400px; margin: 0 auto; padding: 16px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.card h2, .card h3 { margin: 0 0 12px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.full { grid-column: 1 / -1; }
+label { display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+input, select, textarea {
+  font: inherit; color: var(--ink); background: var(--card); width: 100%;
+  border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px;
+}
+textarea { resize: vertical; }
+small { color: var(--muted); font-size: 12px; }
+button { font: inherit; border: 0; border-radius: 8px; padding: 9px 14px; cursor: pointer; }
+.primary { background: var(--brand); color: #fff; }
+.ghost { background: transparent; color: var(--brand); border: 1px solid var(--line); }
+.danger { background: var(--danger); color: #fff; }
+.small { padding: 5px 9px; font-size: 13px; }
+nav button { background: transparent; color: var(--ink); }
+nav button.active { background: var(--brand); color: #fff; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-bottom: 12px; }
+.toolbar label { min-width: 150px; }
+.table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 9px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 14px; }
+th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover { background: rgba(127, 127, 127, 0.08); }
+.empty { color: var(--muted); text-align: center; }
+.msg { color: var(--muted); min-height: 1.4em; margin: 8px 0 0; }
+.msg.err { color: var(--danger); }
+.badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); white-space: nowrap; }
+.badge.closed { color: var(--ok); }
+.badge.pending_buyer { color: var(--danger); }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0 0 12px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.bill-img { display: block; max-width: 100%; max-height: 640px; border: 1px solid var(--line); border-radius: 8px; }
+.pager { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 10px; }
+.pager label { display: flex; align-items: center; gap: 6px; }
+.pager select { width: auto; }
+/* Registrations table: fits the screen on a computer; on a phone each row becomes a card. */
+#reg-table { table-layout: fixed; }
+#reg-table th, #reg-table td { font-size: 13px; padding: 8px 6px; white-space: normal; overflow-wrap: anywhere; }
+#reg-table td.actions { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+#reg-table td.actions button { margin: 0; }
+@media (max-width: 820px) {
+  .table-wrap { overflow: visible; }
+  #reg-table thead { display: none; }
+  #reg-table, #reg-table tbody, #reg-table tr, #reg-table td { display: block; width: 100%; }
+  #reg-table tr { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 10px; background: var(--card); }
+  #reg-table td { border: 0; padding: 4px 0; display: flex; justify-content: space-between; gap: 12px; }
+  #reg-table td::before { content: attr(data-label); color: var(--muted); font-weight: 600; flex: 0 0 42%; }
+  #reg-table td.actions { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; }
+  #reg-table td.actions::before { content: none; }
+}
+.comment { border-left: 3px solid var(--line); padding: 6px 10px; margin: 10px 0; }
+.comment.buyer { border-color: var(--brand); }
+.comment .meta { font-size: 12px; color: var(--muted); }
+.comment .body { white-space: pre-wrap; }
+.note { color: var(--muted); }
+.radio { border: 0; padding: 0; margin: 12px 0; display: grid; gap: 6px; }
+.radio legend { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+.radio label { display: flex; gap: 8px; align-items: center; color: var(--ink); }
+.radio input { width: auto; }
+.login { max-width: 380px; margin: 40px auto; }
+.login form { display: grid; gap: 12px; }
+.inline-form { margin-top: 12px; }
+#view-cmp .back { margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand" data-i18n="app_title"></div>
+  <div class="hdr-right">
+    <span id="who" class="note"></span>
+    <span id="lang-slot"></span>
+    <button id="signout" class="ghost" data-i18n="sign_out" hidden></button>
+  </div>
+</header>
+
+<nav id="nav" hidden>
+  <button data-view="reg" data-i18n="nav_registrations"></button>
+  <button data-view="cmp" data-i18n="nav_complaints"></button>
+  <button data-view="staff" data-i18n="nav_staff" hidden></button>
+</nav>
+
+<main>
+  <!-- LOGIN -->
+  <section id="view-login" class="login" hidden>
+    <div class="card">
+      <h2 data-i18n="login_title"></h2>
+      <form id="login-form">
+        <label><span data-i18n="login_role"></span>
+          <select id="l-role">
+            <option value="engineer" data-i18n="role_engineer"></option>
+            <option value="admin" data-i18n="role_admin"></option>
+          </select>
+        </label>
+        <label><span id="l-id-label"></span>
+          <input id="l-id" autocomplete="username" required>
+        </label>
+        <label><span data-i18n="login_password"></span>
+          <input id="l-pw" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="primary" data-i18n="login_button"></button>
+        <p id="l-err" class="msg err"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- REGISTRATIONS -->
+  <section id="view-reg" hidden>
+    <h2 data-i18n="reg_title"></h2>
+    <form id="reg-filter" class="toolbar">
+      <label><span data-i18n="filter_name"></span><input id="f-name" maxlength="100"></label>
+      <label><span data-i18n="filter_phone"></span><input id="f-phone" maxlength="20" inputmode="numeric"></label>
+      <label><span data-i18n="filter_product"></span><input id="f-product" maxlength="100"></label>
+      <label><span data-i18n="date_from"></span><input id="f-from" type="date"></label>
+      <label><span data-i18n="date_to"></span><input id="f-to" type="date"></label>
+      <label><span data-i18n="sort_by"></span><select id="f-sort"></select></label>
+      <label><span data-i18n="order"></span>
+        <select id="f-dir">
+          <option value="asc" data-i18n="asc"></option>
+          <option value="desc" data-i18n="desc"></option>
+        </select>
+      </label>
+      <button class="primary" data-i18n="search"></button>
+    </form>
+
+    <div class="actions" style="margin-bottom:12px">
+      <button id="reg-add-btn" class="primary" data-i18n="reg_add"></button>
+    </div>
+
+    <div id="reg-add-wrap" class="card" hidden>
+      <h3 data-i18n="add_title"></h3>
+      <form id="reg-form"></form>
+    </div>
+
+    <div id="reg-edit-wrap" class="card" hidden>
+      <h3 data-i18n="btn_edit"></h3>
+      <form id="reg-edit"></form>
+    </div>
+
+    <div class="table-wrap">
+      <table id="reg-table">
+        <thead><tr>
+          <th data-i18n="col_buyer"></th><th data-i18n="col_phone"></th><th data-i18n="col_category"></th>
+          <th data-i18n="col_model"></th><th data-i18n="col_date"></th><th data-i18n="col_place"></th>
+          <th data-i18n="serial_no"></th><th data-i18n="col_order_dealer"></th><th data-i18n="reg_email"></th>
+          <th data-i18n="col_registered"></th><th data-i18n="col_actions"></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <label><span data-i18n="per_page"></span>
+        <select id="f-size"><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option></select>
+      </label>
+      <button type="button" class="ghost" id="pg-prev" data-i18n="prev_page"></button>
+      <span id="pg-info" class="muted"></span>
+      <button type="button" class="ghost" id="pg-next" data-i18n="next_page"></button>
+    </div>
+    <p id="reg-msg" class="msg"></p>
+  </section>
+
+  <!-- VIEW REGISTRATION -->
+  <section id="view-regdetail" hidden>
+    <button class="ghost back" id="back-to-regs" data-i18n="btn_back"></button>
+    <div id="regdetail-body"></div>
+  </section>
+
+  <!-- COMPLAINTS -->
+  <section id="view-cmp" hidden>
+    <div id="cmp-list">
+      <h2 data-i18n="complaints_title"></h2>
+      <div class="toolbar">
+        <label><span data-i18n="col_status"></span>
+          <select id="cmp-status">
+            <option value="" data-i18n="status_all"></option>
+            <option value="pending_engineer" data-i18n="status_pending_engineer"></option>
+            <option value="pending_buyer" data-i18n="status_pending_buyer"></option>
+            <option value="closed" data-i18n="status_closed"></option>
+          </select>
+        </label>
+      </div>
+      <div class="table-wrap">
+        <table class="clickable">
+          <thead><tr>
+            <th data-i18n="col_ticket"></th><th data-i18n="col_buyer"></th><th data-i18n="col_category"></th>
+            <th data-i18n="col_status"></th><th data-i18n="col_updated"></th>
+          </tr></thead>
+          <tbody id="cmp-body"></tbody>
+        </table>
+      </div>
+      <p id="cmp-msg" class="msg"></p>
+    </div>
+    <div id="cmp-detail" hidden></div>
+  </section>
+
+  <!-- STAFF ACCOUNTS (admin only) -->
+  <section id="view-staff" hidden>
+    <h2 data-i18n="staff_title"></h2>
+    <div class="card">
+      <h3 data-i18n="staff_create"></h3>
+      <form id="acc-form" class="grid">
+        <label><span data-i18n="kind"></span>
+          <select id="acc-kind">
+            <option value="engineer" data-i18n="kind_engineer"></option>
+            <option value="admin" data-i18n="kind_admin"></option>
+          </select>
+        </label>
+        <label><span data-i18n="account_name"></span><input id="acc-name" maxlength="100" required></label>
+        <label><span id="acc-login-label"></span><input id="acc-login" maxlength="120" required></label>
+        <label><span data-i18n="account_password"></span><input id="acc-pw" type="password" minlength="10" maxlength="200" required autocomplete="new-password"></label>
+        <div class="full actions"><button class="primary" data-i18n="staff_create"></button></div>
+        <p id="acc-msg" class="msg full"></p>
+      </form>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-i18n="kind"></th><th data-i18n="account_name"></th><th data-i18n="account_login"></th><th data-i18n="active"></th>
+        </tr></thead>
+        <tbody id="acc-body"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script src="i18n.js"></script>
+<script src="i18n-staff-bill.js"></script>
+<script src="i18n-cols.js"></script>
+<script src="i18n-reg.js"></script>
+<script>
+const API = 'https://api.bleatconnect.in';
+const STATUSES = ['pending_engineer', 'pending_buyer', 'closed'];
+const SORTS = ['registered', 'buyer', 'phone', 'category', 'model', 'date', 'place'];
+const DD_LISTS = ['product_category', 'place_of_purchase'];
+const OFFLINE = 'Offline Dealer';
+const PORTAL = 'Other Online Portal';
+
+let me = null;                 // { role, name } once signed in
+const dropdowns = {};          // list key -> [{ value, is_default }]
+const regRows = new Map();     // registration id -> row, for editing
+let currentTicket = null;
+
+const $ = (sel, root = document) => root.querySelector(sel);
+const showEl = (el, on) => { el.hidden = !on; };
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function fmtDate(ms) {
+  if (!ms) return '';
+  try { return new Date(ms).toLocaleString(document.documentElement.lang || 'en'); } catch (_) { return ''; }
+}
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function statusLabel(s) { return t('status_' + s); }
+function errText(err) {
+  const fields = err.fields ? Object.values(err.fields).filter(Boolean) : [];
+  return [err.message, ...fields].filter(Boolean).join(' ');
+}
+function say(scope, text, isErr = false) {
+  const m = (scope && scope.querySelector('[data-msg]')) || $('#reg-msg');
+  m.textContent = text;
+  m.classList.toggle('err', isErr);
+}
+
+// Every API call goes through here. The session cookie is sent automatically.
+async function api(path, opts = {}) {
+  const init = { method: opts.method || 'GET', credentials: 'include', headers: {} };
+  if (opts.body !== undefined) {
+    init.headers['content-type'] = 'application/json';
+    init.body = JSON.stringify(opts.body);
+  }
+  let res;
+  try { res = await fetch(API + path, init); } catch (_) { throw { status: 0, message: t('error') }; }
+  let data = {};
+  try { data = await res.json(); } catch (_) {}
+  if (res.status === 401 && !path.startsWith('/api/staff/login') && me) {
+    me = null;
+    showLogin(t('login_failed'));
+  }
+  if (!res.ok) throw { status: res.status, message: data.error || t('error'), fields: data.fields || {} };
+  return data;
+}
+
+// ---------- Views ----------
+const VIEWS = ['login', 'reg', 'regdetail', 'cmp', 'staff'];
+function showView(name) {
+  for (const v of VIEWS) showEl($('#view-' + v), v === name);
+  for (const b of document.querySelectorAll('#nav button')) b.classList.toggle('active', b.dataset.view === (name === 'regdetail' ? 'reg' : name));
+}
+function go(name) {
+  showView(name);
+  if (name === 'reg') loadRegs();
+  if (name === 'cmp') { showEl($('#cmp-list'), true); showEl($('#cmp-detail'), false); loadTickets(); }
+  if (name === 'staff') loadAccounts();
+}
+function showLogin(message = '') {
+  me = null;
+  showEl($('#nav'), false);
+  showEl($('#signout'), false);
+  $('#who').textContent = '';
+  $('#l-err').textContent = message;
+  showView('login');
+}
+function enterApp() {
+  $('#who').textContent = `${me.name} · ${me.role === 'admin' ? t('role_admin') : t('role_engineer')}`;
+  showEl($('#nav'), true);
+  showEl($('#signout'), true);
+  showEl(document.querySelector('#nav [data-view="staff"]'), me.role === 'admin');
+  go('reg');
+}
+
+// ---------- Dropdowns and product form ----------
+async function loadDropdowns() {
+  for (const list of DD_LISTS) {
+    const d = await api('/api/dropdowns?list=' + list);
+    dropdowns[list] = d.options || [];
+  }
+}
+function optionList(list, selected) {
+  return (dropdowns[list] || []).map((o) =>
+    `<option value="${esc(o.value)}" ${o.value === selected ? 'selected' : ''}>${esc(o.value)}</option>`).join('');
+}
+// mode 'add' asks for buyer contact details too; 'edit' only asks for the buyer's name.
+function productFields(mode, d = {}) {
+  const defaultCat = (dropdowns.product_category || []).find((o) => o.is_default)?.value || '';
+  const cat = d.category || defaultCat;
+  const place = d.place_of_purchase || '';
+  const offline = place === OFFLINE;
+  const portal = place === PORTAL;
+  const buyer = mode === 'add'
+    ? `<label>${t('buyer_name')} *<input name="buyer_name" maxlength="100" required></label>
+       <label>${t('buyer_email')} *<input name="buyer_email" type="email" maxlength="254" required></label>
+       <label>${t('buyer_phone')} *<input name="buyer_phone" data-digits maxlength="10" inputmode="numeric" required></label>`
+    : `<label>${t('buyer_name')} *<input name="buyer_name" maxlength="100" required value="${esc(d.buyer_name || '')}"></label>`;
+  return `
+    <div class="grid">
+      ${buyer}
+      <label>${t('category')} *<select name="category" required>${optionList('product_category', cat)}</select></label>
+      <label>${t('model')} *<input name="model_name" maxlength="100" required value="${esc(d.model_name || '')}"></label>
+      <label>${t('purchase_date')} *<input name="purchase_date" type="date" required max="${todayISO()}" value="${esc(d.purchase_date || '')}"></label>
+      <label>${t('place')} *<select name="place_of_purchase" required><option value="">${t('select')}</option>${optionList('place_of_purchase', place)}</select></label>
+      <label ${offline || portal ? '' : 'hidden'}><span class="dealer-text">${t(portal ? 'portal_details' : 'dealer_name')}</span> *<input name="dealer_name" maxlength="120" value="${esc(d.dealer_name || '')}" ${offline || portal ? 'required' : ''}></label>
+      <label ${offline ? 'hidden' : ''}>${t('order_no')} *<input name="order_no" maxlength="60" value="${esc(d.order_no || '')}" ${offline ? '' : 'required'}></label>
+      <label>${t('serial_no')} *<input name="serial_no" maxlength="64" required value="${esc(d.serial_no || '')}"><small>${t('serial_hint')}</small></label>
+      <label>${t('reg_email')} *<input name="reg_email" type="email" maxlength="254" required value="${esc(d.reg_email || '')}"></label>
+      <label>${t('reg_phone')} *<input name="reg_phone" data-digits maxlength="10" inputmode="numeric" required value="${esc(d.reg_phone || '')}"></label>
+    </div>`;
+}
+function syncPlace(form) {
+  const place = form.querySelector('[name=place_of_purchase]').value;
+  const offline = place === OFFLINE;
+  const portal = place === PORTAL;
+  const dealer = form.querySelector('[name=dealer_name]');
+  const order = form.querySelector('[name=order_no]');
+  dealer.closest('label').hidden = !(offline || portal);
+  dealer.closest('label').querySelector('.dealer-text').textContent = t(portal ? 'portal_details' : 'dealer_name');
+  dealer.required = offline || portal;
+  if (!(offline || portal)) dealer.value = '';
+  order.closest('label').hidden = offline;
+  order.required = !offline;
+  if (offline) order.value = '';
+}
+function formBody(form) {
+  const o = {};
+  for (const [k, v] of new FormData(form).entries()) o[k] = typeof v === 'string' ? v.trim() : v;
+  return o;
+}
+
+// ---------- Registrations ----------
+let regPage = 1, regPages = 1;
+function updatePager(total, page, pages) {
+  regPage = page;
+  regPages = pages;
+  $('#pg-info').textContent = t('page_info').replace('{p}', page).replace('{n}', pages).replace('{total}', total);
+  $('#pg-prev').disabled = page <= 1;
+  $('#pg-next').disabled = page >= pages;
+}
+function regQuery() {
+  const q = new URLSearchParams();
+  for (const k of ['name', 'phone', 'product']) {
+    const v = $('#f-' + k).value.trim();
+    if (v) q.set(k, v);
+  }
+  for (const k of ['from', 'to']) {
+    const v = $('#f-' + k).value;
+    if (v) q.set(k, v);
+  }
+  q.set('size', $('#f-size').value);
+  q.set('page', regPage);
+  q.set('sort', $('#f-sort').value);
+  q.set('dir', $('#f-dir').value);
+  return q.toString();
+}
+async function loadRegs() {
+  const msg = $('#reg-msg');
+  msg.textContent = t('loading');
+  msg.classList.remove('err');
+  try {
+    const { registrations, total, page, pages } = await api('/api/staff/registrations?' + regQuery());
+    updatePager(total, page, pages);
+    regRows.clear();
+    const tb = $('#reg-table tbody');
+    if (!registrations.length) {
+      tb.innerHTML = `<tr><td colspan="11" class="empty">${t('empty')}</td></tr>`;
+    } else {
+      tb.innerHTML = registrations.map((r) => {
+        regRows.set(String(r.id), r);
+        return `<tr>
+          <td data-label="${esc(t('col_buyer'))}">${esc(r.buyer_name)}</td><td data-label="${esc(t('col_phone'))}">${esc(r.phone)}</td><td data-label="${esc(t('col_category'))}">${esc(r.category)}</td>
+          <td data-label="${esc(t('col_model'))}">${esc(r.model_name)}</td><td data-label="${esc(t('col_date'))}">${esc(r.purchase_date)}</td><td data-label="${esc(t('col_place'))}">${esc(r.place_of_purchase)}</td>
+          <td data-label="${esc(t('serial_no'))}">${esc(r.serial_no)}</td><td data-label="${esc(t('col_order_dealer'))}">${esc([r.order_no, r.dealer_name].filter(Boolean).join(' / '))}</td>
+          <td data-label="${esc(t('reg_email'))}">${esc(r.reg_email)}</td><td data-label="${esc(t('col_registered'))}">${esc(new Date(r.registered_at).toLocaleDateString('en-IN'))}</td>
+          <td class="actions">
+            <button class="small" data-act="view" data-id="${r.id}">${t('btn_view_registration')}</button>
+            <button class="small ghost" data-act="edit" data-id="${r.id}">${t('btn_edit')}</button>
+            ${me.role === 'admin' ? `<button class="small danger" data-act="delete" data-id="${r.id}">${t('btn_delete')}</button>` : ''}
+          </td></tr>`;
+      }).join('');
+    }
+    msg.textContent = '';
+  } catch (err) {
+    msg.textContent = errText(err);
+    msg.classList.add('err');
+  }
+}
+function openRegAdd() {
+  const wrap = $('#reg-add-wrap');
+  const form = $('#reg-form');
+  form.innerHTML = productFields('add') + `
+    <div class="actions">
+      <button class="primary" type="submit">${t('btn_save')}</button>
+      <button class="ghost" type="button" data-cancel="reg-add-wrap">${t('btn_cancel')}</button>
+    </div>
+    <p class="msg" data-msg></p>`;
+  showEl(wrap, true);
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+// ---------- View Registration (full page, one line per detail) ----------
+let billObjectUrl = null;
+async function loadBillPhoto(id) {
+  const res = await fetch(`${API}/api/staff/registrations/${id}/bill`, { credentials: 'include' });
+  if (!res.ok) return '';
+  if (billObjectUrl) URL.revokeObjectURL(billObjectUrl);
+  billObjectUrl = URL.createObjectURL(await res.blob());
+  return `<img class="bill-img" src="${billObjectUrl}" alt="${esc(t('bill_photo'))}">`;
+}
+async function openRegDetail(id) {
+  showView('regdetail');
+  const d = $('#regdetail-body');
+  d.innerHTML = `<p class="msg">${t('loading')}</p>`;
+  try {
+    const { registration: r } = await api(`/api/staff/registrations/${id}`);
+    const address = [r.address_line1, r.address_line2, r.city, r.state, r.country, r.postal_code].filter(Boolean).join(', ');
+    const photo = r.has_bill ? await loadBillPhoto(id) : '';
+    d.innerHTML = `
+      <section class="card">
+        <h2>${t('reg_detail_title')} · ${esc(r.model_name)}</h2>
+        <dl class="facts">
+          <dt>${t('buyer_name')}</dt><dd>${esc(r.full_name)}</dd>
+          <dt>${t('buyer_email')}</dt><dd>${esc(r.buyer_email)}</dd>
+          <dt>${t('buyer_phone')}</dt><dd>${esc(r.buyer_phone)}</dd>
+          <dt>${t('reg_address')}</dt><dd>${esc(address)}</dd>
+          <dt>${t('category')}</dt><dd>${esc(r.category)}</dd>
+          <dt>${t('model')}</dt><dd>${esc(r.model_name)}</dd>
+          <dt>${t('purchase_date')}</dt><dd>${esc(r.purchase_date)}</dd>
+          <dt>${t('place')}</dt><dd>${esc(r.place_of_purchase)}</dd>
+          <dt>${t('dealer_name')}</dt><dd>${esc(r.dealer_name || '')}</dd>
+          <dt>${t('order_no')}</dt><dd>${esc(r.order_no || '')}</dd>
+          <dt>${t('serial_no')}</dt><dd>${esc(r.serial_no)}</dd>
+          <dt>${t('reg_email')}</dt><dd>${esc(r.reg_email)}</dd>
+          <dt>${t('reg_phone')}</dt><dd>${esc(r.reg_phone)}</dd>
+          <dt>${t('col_registered')}</dt><dd>${esc(fmtDate(r.registered_at))}</dd>
+        </dl>
+        ${photo ? `<h3>${t('bill_photo')}</h3>${photo}` : ''}
+      </section>`;
+  } catch (err) {
+    d.innerHTML = `<p class="msg err">${esc(errText(err))}</p>`;
+  }
+}
+function openRegEdit(id) {
+  const r = regRows.get(String(id));
+  if (!r) return;
+  const wrap = $('#reg-edit-wrap');
+  const form = $('#reg-edit');
+  form.dataset.id = id;
+  form.innerHTML = productFields('edit', { ...r, reg_phone: r.phone }) + `
+    <label class="full" style="margin-top:12px">${t('reason')}
+      <input name="reason" minlength="5" maxlength="300" required></label>
+    <div class="actions">
+      <button class="primary" type="submit">${t('btn_save')}</button>
+      <button class="ghost" type="button" data-cancel="reg-edit-wrap">${t('btn_cancel')}</button>
+    </div>
+    <p class="msg" data-msg></p>`;
+  showEl(wrap, true);
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+async function onRegAdd(form) {
+  try {
+    await api('/api/staff/registrations', { method: 'POST', body: formBody(form) });
+    form.reset();
+    showEl($('#reg-add-wrap'), false);
+    say(null, t('saved'));
+    loadRegs();
+  } catch (err) {
+    say(form, errText(err), true);
+  }
+}
+async function onRegEdit(form) {
+  const id = form.dataset.id;
+  try {
+    await api(`/api/staff/registrations/${id}`, { method: 'PUT', body: formBody(form) });
+    showEl($('#reg-edit-wrap'), false);
+    say(null, t('saved'));
+    loadRegs();
+  } catch (err) {
+    say(form, errText(err), true);
+  }
+}
+async function deleteReg(id) {
+  const reason = prompt(t('reason_delete'));
+  if (reason === null) return;
+  if (!confirm(t('confirm_delete'))) return;
+  try {
+    await api(`/api/staff/registrations/${id}`, { method: 'DELETE', body: { reason } });
+    say(null, t('deleted'));
+    loadRegs();
+  } catch (err) {
+    say(null, errText(err), true);
+  }
+}
+
+// ---------- Complaints ----------
+async function loadTickets() {
+  const msg = $('#cmp-msg');
+  msg.textContent = t('loading');
+  msg.classList.remove('err');
+  try {
+    const status = $('#cmp-status').value;
+    const { tickets } = await api('/api/staff/tickets' + (status ? '?status=' + status : ''));
+    const tb = $('#cmp-body');
+    tb.innerHTML = tickets.length
+      ? tickets.map((r) => `<tr class="clickable" data-ticket="${r.id}">
+          <td>${esc(r.ticket_no)}</td><td>${esc(r.buyer_name)}</td>
+          <td>${esc(r.category)} · ${esc(r.model_name)}</td>
+          <td><span class="badge ${esc(r.status)}">${esc(statusLabel(r.status))}</span></td>
+          <td>${esc(fmtDate(r.updated_at))}</td></tr>`).join('')
+      : `<tr><td colspan="5" class="empty">${t('empty')}</td></tr>`;
+    msg.textContent = '';
+  } catch (err) {
+    msg.textContent = errText(err);
+    msg.classList.add('err');
+  }
+}
+function commentHTML(c) {
+  return `<div class="comment ${esc(c.author_type)}">
+    <div class="meta"><b>${esc(c.author_name || '')}</b> · ${esc(fmtDate(c.created_at))}</div>
+    <div class="body">${esc(c.body)}</div>
+  </div>`;
+}
+async function openTicket(id) {
+  showEl($('#cmp-list'), false);
+  showEl($('#cmp-detail'), true);
+  const d = $('#cmp-detail');
+  d.innerHTML = `<p class="msg">${t('loading')}</p>`;
+  try {
+    const { ticket: tk, comments } = await api(`/api/staff/tickets/${id}`);
+    currentTicket = tk.id;
+    const closed = tk.status === 'closed';
+    d.innerHTML = `
+      <button class="ghost back" id="back-to-list">${t('btn_back')}</button>
+      <section class="card">
+        <h2>${esc(tk.ticket_no)} <span class="badge ${esc(tk.status)}">${esc(statusLabel(tk.status))}</span></h2>
+        <dl class="facts">
+          <dt>${t('col_buyer')}</dt><dd>${esc(tk.buyer_name)}</dd>
+          <dt>${t('buyer_phone')}</dt><dd>${esc(tk.buyer_phone)}</dd>
+          <dt>${t('col_category')} / ${t('col_model')}</dt><dd>${esc(tk.category)} · ${esc(tk.model_name)}</dd>
+          <dt>${t('serial_no')}</dt><dd>${esc(tk.serial_no)}</dd>
+          <dt>${t('col_updated')}</dt><dd>${esc(fmtDate(tk.updated_at))}</dd>
+        </dl>
+        <details>
+          <summary>${t('edit_complaint')}</summary>
+          <form id="cmp-edit" class="grid inline-form">
+            <label class="full">${t('issue')} *<textarea name="issue_text" rows="4" maxlength="2000" required>${esc(tk.issue_text)}</textarea></label>
+            <label>${t('whatsapp')} *<input name="whatsapp" maxlength="20" required value="${esc(tk.whatsapp)}"></label>
+            <label>${t('contact_email')} *<input name="contact_email" type="email" maxlength="254" required value="${esc(tk.contact_email)}"></label>
+            <label class="full">${t('reason')}<input name="reason" minlength="5" maxlength="300" required></label>
+            <div class="full actions"><button class="primary" type="submit">${t('btn_save')}</button></div>
+            <p class="msg full" data-msg></p>
+          </form>
+        </details>
+      </section>
+      <section class="card">
+        <h3>${t('comments_title')}</h3>
+        <div>${comments.map(commentHTML).join('') || `<p class="empty">${t('empty')}</p>`}</div>
+        ${closed ? `
+          <p class="note">${t('closed_note')}</p>
+          <form id="reopen-form" class="grid">
+            <label class="full">${t('reopen_reason')}<input name="reason" minlength="5" maxlength="300" required></label>
+            <div class="full actions"><button class="primary" type="submit">${t('reopen')}</button></div>
+            <p class="msg full" data-msg></p>
+          </form>` : `
+          <form id="comment-form" class="inline-form">
+            <label class="full">${t('comments_title')}
+              <textarea name="body" rows="3" minlength="2" maxlength="2000" required placeholder="${esc(t('comment_placeholder'))}"></textarea></label>
+            <fieldset class="radio">
+              <legend>${t('next_status')}</legend>
+              <label><input type="radio" name="next_status" value="pending_buyer" required> ${t('set_pending_buyer')}</label>
+              <label><input type="radio" name="next_status" value="pending_engineer"> ${t('set_pending_engineer')}</label>
+              <label><input type="radio" name="next_status" value="closed"> ${t('set_close')}</label>
+            </fieldset>
+            <div class="actions"><button class="primary" type="submit">${t('post_comment')}</button></div>
+            <p class="msg" data-msg></p>
+          </form>`}
+      </section>`;
+  } catch (err) {
+    d.innerHTML = `<p class="msg err">${esc(errText(err))}</p><button class="ghost" id="back-to-list">${t('btn_back')}</button>`;
+  }
+}
+async function onTicketEdit(form) {
+  try {
+    await api(`/api/staff/tickets/${currentTicket}`, { method: 'PUT', body: formBody(form) });
+    openTicket(currentTicket);
+  } catch (err) { say(form, errText(err), true); }
+}
+async function onComment(form) {
+  const body = formBody(form);
+  try {
+    await api(`/api/staff/tickets/${currentTicket}/comments`, { method: 'POST', body: { body: body.body, next_status: body.next_status } });
+    openTicket(currentTicket);
+  } catch (err) { say(form, errText(err), true); }
+}
+async function onReopen(form) {
+  try {
+    await api(`/api/staff/tickets/${currentTicket}/reopen`, { method: 'POST', body: formBody(form) });
+    openTicket(currentTicket);
+  } catch (err) { say(form, errText(err), true); }
+}
+
+// ---------- Staff accounts (admin) ----------
+function updateAccLoginLabel() {
+  const admin = $('#acc-kind').value === 'admin';
+  $('#acc-login-label').textContent = t(admin ? 'login_id_admin' : 'account_login');
+  $('#acc-login').type = admin ? 'email' : 'text';
+}
+async function loadAccounts() {
+  if (me.role !== 'admin') {
+    $('#acc-body').innerHTML = `<tr><td colspan="4" class="empty">${t('admin_only')}</td></tr>`;
+    return;
+  }
+  try {
+    const { accounts } = await api('/api/staff/accounts');
+    $('#acc-body').innerHTML = accounts.map((a) => `<tr>
+        <td>${esc(a.kind === 'admin' ? t('kind_admin') : t('kind_engineer'))}</td>
+        <td>${esc(a.name)}</td><td>${esc(a.login)}</td>
+        <td>${a.active ? t('active') : '—'}</td></tr>`).join('');
+  } catch (err) {
+    $('#acc-body').innerHTML = `<tr><td colspan="4" class="msg err">${esc(errText(err))}</td></tr>`;
+  }
+}
+async function onAccCreate(form) {
+  const msg = $('#acc-msg');
+  try {
+    const body = formBody(form);
+    body.kind = $('#acc-kind').value;
+    await api('/api/staff/accounts', { method: 'POST', body: { kind: body.kind, name: body.name, login: body.login, password: $('#acc-pw').value } });
+    msg.textContent = t('saved');
+    msg.classList.remove('err');
+    form.reset();
+    updateAccLoginLabel();
+    loadAccounts();
+  } catch (err) {
+    msg.textContent = errText(err);
+    msg.classList.add('err');
+  }
+}
+
+// ---------- Sign in / out ----------
+async function onLogin(form) {
+  const err = $('#l-err');
+  err.textContent = '';
+  try {
+    await api('/api/staff/login', { method: 'POST', body: { role: $('#l-role').value, login: $('#l-id').value.trim(), password: $('#l-pw').value } });
+    $('#l-pw').value = '';
+    me = await api('/api/staff/me');
+    await loadDropdowns();
+    enterApp();
+  } catch (e) {
+    err.textContent = e.status === 401 ? t('login_failed') : errText(e);
+  }
+}
+async function signOut() {
+  try { await api('/api/staff/logout', { method: 'POST' }); } catch (_) {}
+  showLogin();
+}
+
+// ---------- Event wiring ----------
+const SUBMIT = {
+  'login-form': onLogin,
+  'reg-filter': () => { regPage = 1; loadRegs(); },
+  'reg-form': onRegAdd,
+  'reg-edit': onRegEdit,
+  'cmp-edit': onTicketEdit,
+  'comment-form': onComment,
+  'reopen-form': onReopen,
+  'acc-form': onAccCreate,
+};
+document.addEventListener('submit', (e) => {
+  const h = SUBMIT[e.target.id];
+  if (h) { e.preventDefault(); h(e.target); }
+});
+
+document.addEventListener('click', (e) => {
+  const navBtn = e.target.closest('#nav button');
+  if (navBtn) return go(navBtn.dataset.view);
+  const act = e.target.closest('[data-act]');
+  if (act) {
+    const id = act.dataset.id;
+    if (act.dataset.act === 'view') openRegDetail(id);
+    if (act.dataset.act === 'edit') openRegEdit(id);
+    if (act.dataset.act === 'delete') deleteReg(id);
+    return;
+  }
+  const row = e.target.closest('tr[data-ticket]');
+  if (row) return openTicket(row.dataset.ticket);
+  if (e.target.id === 'back-to-regs') return go('reg');
+  if (e.target.id === 'pg-prev' && regPage > 1) { regPage -= 1; return loadRegs(); }
+  if (e.target.id === 'pg-next' && regPage < regPages) { regPage += 1; return loadRegs(); }
+  if (e.target.id === 'back-to-list') return go('cmp');
+  if (e.target.id === 'reg-add-btn') return openRegAdd();
+  const cancel = e.target.closest('[data-cancel]');
+  if (cancel) return showEl($('#' + cancel.dataset.cancel), false);
+  if (e.target.id === 'signout') return signOut();
+});
+
+document.addEventListener('change', (e) => {
+  if (e.target.name === 'place_of_purchase') syncPlace(e.target.form);
+  if (e.target.id === 'cmp-status') loadTickets();
+  if (e.target.id === 'f-size') { regPage = 1; loadRegs(); }
+  if (e.target.id === 'l-role') updateLoginLabel();
+  if (e.target.id === 'acc-kind') updateAccLoginLabel();
+});
+
+// Numbers only for phone fields, as on the buyer portal.
+document.addEventListener('input', (e) => {
+  const el = e.target;
+  if (el.dataset && el.dataset.digits !== undefined) {
+    const v = el.value.replace(/\D/g, '').slice(0, 10);
+    if (v !== el.value) el.value = v;
+  }
+});
+// Open the calendar when a date field is focused.
+document.addEventListener('focusin', (e) => {
+  if (e.target.type === 'date' && e.target.showPicker) { try { e.target.showPicker(); } catch (_) {} }
+});
+
+function updateLoginLabel() {
+  const admin = $('#l-role').value === 'admin';
+  $('#l-id-label').textContent = t(admin ? 'login_id_admin' : 'login_id_engineer');
+  $('#l-id').type = admin ? 'email' : 'text';
+}
+
+function fillSortOptions() {
+  $('#f-sort').innerHTML = SORTS.map((s) => `<option value="${s}">${esc(t('sort_' + s))}</option>`).join('');
+}
+
+// ---------- Start ----------
+(async function boot() {
+  applyI18n();
+  $('#lang-slot').appendChild(languageSelect());
+  fillSortOptions();
+  updateLoginLabel();
+  updateAccLoginLabel();
+  try {
+    me = await api('/api/staff/me');
+    await loadDropdowns();
+    enterApp();
+  } catch (_) {
+    showLogin();
+  }
+})();
+</script>
+</body>
+</html>
