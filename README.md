@@ -107,8 +107,9 @@ Buyers can sign in with Google or with a 6-digit code sent on WhatsApp (Meta Wha
 
 One-time setup:
 
-1. In Meta Business, create an **authentication** message template named `bleat_login_otp` (language `en`).
-   Body: `{{1}} is your BLEAT login code.` Add a **Copy code** button. Wait for approval.
+1. In Meta Business Manager (WhatsApp Manager), create an **Authentication** template named `bleat_login_otp`,
+   language `en`. Meta fixes the body text ("{{1}} is your verification code."), so use that. Add the
+   security recommendation and a 5-minute expiry, and a single **Copy code** button (OTP type). Submit and wait for approval.
 2. Set the Worker secrets (never commit these):
    - `npx wrangler secret put WHATSAPP_ACCESS_TOKEN` (permanent system-user token)
    - `npx wrangler secret put OTP_PEPPER` (any long random string; it salts the code hashes)
