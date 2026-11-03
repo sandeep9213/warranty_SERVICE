@@ -265,10 +265,11 @@ async function verifyOtp(request, env) {
     .bind(t, row.id).run();
   if (!used.meta.changes) throw new HttpError(401, 'This code was already used. Please request a new one.');
 
-  // Link to a buyer account with this number only when the number is trusted: entered by staff (migrated or
-  // staff-created) or already proven by an earlier OTP. A number a buyer typed into their own profile is not trusted.
+  // One buyer account per mobile number. The WhatsApp code proves the number, so sign in to the account that
+  // already has it (for example a Google account with the same number in its profile). Prefer that account over
+  // a WhatsApp-only one. Only create a new account when no account has this number.
   let user = await env.DB.prepare(
-    "SELECT id FROM users WHERE phone = ? AND (google_sub LIKE 'manual:%' OR phone_verified_at IS NOT NULL) ORDER BY id LIMIT 1"
+    "SELECT id FROM users WHERE phone = ? ORDER BY (google_sub LIKE 'phone:%') ASC, id ASC LIMIT 1"
   ).bind(phone).first();
   if (user) {
     await env.DB.prepare('UPDATE users SET phone_verified_at = ?, updated_at = ? WHERE id = ?').bind(t, t, user.id).run();
@@ -336,6 +337,12 @@ async function saveProfile(request, env) {
   const current = await env.DB.prepare('SELECT consent_at FROM users WHERE id = ?').bind(userId).first();
   if (!current.consent_at && b.consent !== true) {
     throw new HttpError(422, 'Please accept the privacy notice to continue.', { consent: 'Required.' });
+  }
+
+  // A mobile number belongs to one account only.
+  const clash = await env.DB.prepare('SELECT id FROM users WHERE phone = ? AND id <> ?').bind(d.phone, userId).first();
+  if (clash) {
+    throw new HttpError(422, 'This mobile number is already linked to another BLEAT account.', { phone: 'This number is already in use.' });
   }
 
   const t = now();

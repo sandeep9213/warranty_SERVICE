@@ -187,3 +187,4 @@ CREATE TABLE IF NOT EXISTS otp_codes (
 CREATE INDEX IF NOT EXISTS idx_otp_phone ON otp_codes (phone, created_at);
 CREATE INDEX IF NOT EXISTS idx_otp_ip ON otp_codes (ip, created_at);
 ALTER TABLE users ADD COLUMN phone_verified_at INTEGER;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_phone_unique ON users (phone) WHERE phone IS NOT NULL AND phone <> '';
