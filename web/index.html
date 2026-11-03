@@ -207,6 +207,7 @@ main:has(#view-login:not(.hidden)){max-width:none;padding:0}
           <label class="li-label" for="otp-phone">WhatsApp number</label>
           <div class="li-field"><span>+91</span><input id="otp-phone" type="tel" inputmode="numeric" maxlength="10" data-digits placeholder="10-digit mobile number" autocomplete="tel-national"></div>
           <button type="button" id="otp-send" class="li-btn">Send code on WhatsApp</button>
+          <p class="li-note">We only use your number to send a one-time code and to find your products.</p>
         </div>
 
         <div id="otp-verify" class="hidden">
@@ -230,7 +231,6 @@ main:has(#view-login:not(.hidden)){max-width:none;padding:0}
 
       <div id="panel-google" class="hidden" role="tabpanel"><div id="gsi-button"></div></div>
 
-      <p class="li-note">We only use your number to send a one-time code and to find your products.</p>
       <p class="li-err" id="login-err"></p>
     </div>
   </section>
@@ -470,7 +470,6 @@ function toast(msg) {
 
 // ---------- Google sign-in ----------
 let gsiLoaded = false;
-let gsiRendered = false;
 function googleReady() {
   if (gsiLoaded) return;
   gsiLoaded = true;
@@ -485,14 +484,15 @@ function googleReady() {
       }
     },
   });
-  if (!$('#panel-google').classList.contains('hidden')) renderGsiButton();
+  renderGsiButton();
 }
 // The Google button is drawn when its tab opens, so it fits the width of the panel.
 function renderGsiButton() {
-  if (!gsiLoaded || gsiRendered) return;
-  gsiRendered = true;
-  const width = Math.min(300, $('#gsi-button').clientWidth || 280);
-  google.accounts.id.renderButton($('#gsi-button'), { theme: 'outline', size: 'large', text: 'continue_with', width });
+  const el = $('#gsi-button');
+  if (!gsiLoaded || el.offsetParent === null) return;   // draw only while the Google tab is visible
+  el.innerHTML = '';
+  const width = Math.min(300, el.clientWidth || 280);
+  google.accounts.id.renderButton(el, { theme: 'outline', size: 'large', text: 'continue_with', width });
 }
 
 // ---------- Sign-in screen: method tabs and live clock ----------
