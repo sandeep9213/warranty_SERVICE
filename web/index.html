@@ -7,7 +7,7 @@
 <script src="https://accounts.google.com/gsi/client" async defer onload="googleReady()"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..90,600..800&family=Noto+Sans:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@600;700;800&family=Noto+Sans:wght@400;600;700&display=swap">
 <style>
 :root{--bg:#f6f7f9;--card:#ffffff;--text:#1d2330;--muted:#6b7280;--brand:#0b6cff;--err:#c62828;--line:#dfe3ea;--ok:#2e7d32}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1218;--card:#171c25;--text:#e8ebf0;--muted:#9aa3b2;--brand:#4d9bff;--err:#ff6b6b;--line:#2a3140;--ok:#66bb6a}}
@@ -87,45 +87,68 @@ button.small{margin-top:8px;padding:8px 14px;min-height:40px}
   .toast{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom))}
   .row{gap:0}
 }
-.or-divider { display: flex; align-items: center; gap: 10px; margin: 18px 0 14px; color: var(--muted, #666); font-size: 14px; }
-.or-divider::before, .or-divider::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .25; }
-.phone-field { display: flex; align-items: stretch; max-width: 280px; }
-.phone-field .prefix { display: flex; align-items: center; padding: 0 10px; border: 1px solid #ccc; border-right: 0; border-radius: 6px 0 0 6px; background: #f5f5f5; }
-.phone-field input { border-radius: 0 6px 6px 0; }
-#otp-verify { margin-top: 12px; }
-#otp-box button { margin-top: 10px; }
 
-/* ---------- Sign-in screen: daylight road scene with recording overlay ---------- */
-.login-stage{position:relative;min-height:calc(100vh - 64px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 16px 40px;overflow:hidden;background:#2B2F33;font-family:"Noto Sans",system-ui,sans-serif;color:#1C1F22}
-.login-stage .scene{position:absolute;inset:0;z-index:0}
-#view-login.login-stage{width:100vw;max-width:none;position:relative;left:50%;transform:translateX(-50%);margin:-16px 0 -16px}
-.login-stage .scene svg{width:100%;height:100%;display:block}
-.login-stage .rec{position:absolute;z-index:1;top:14px;left:14px;display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(28,31,34,.8);color:#FBFAF7;border-radius:4px;font-size:13px;font-variant-numeric:tabular-nums}
-.login-stage .rec .dot{width:9px;height:9px;border-radius:50%;background:#D64531}
-.login-stage .rec.live .dot{animation:rec-pulse 1.4s ease-in-out infinite}
-.login-stage .rec.saved .dot{background:#7BC47F}
-.login-stage .rec .time{opacity:.75}
-@keyframes rec-pulse{0%,100%{opacity:1}50%{opacity:.25}}
-.login-stage.flash::after{content:"";position:absolute;inset:0;background:#FBFAF7;z-index:2;pointer-events:none;animation:shutter .45s ease-out forwards}
-@keyframes shutter{from{opacity:.85}to{opacity:0}}
-.login-stage .login-card{position:relative;z-index:1;width:100%;max-width:400px;background:#FBFAF7;color:#1C1F22;border:1px solid rgba(28,31,34,.12);border-radius:4px;padding:26px 22px 22px}
-.login-stage h2{font-family:Archivo,"Noto Sans",sans-serif;font-stretch:80%;font-weight:800;font-size:32px;line-height:1.1;margin:0 0 6px;letter-spacing:-.01em;color:#1C1F22}
-.login-stage .sub{margin:0 0 20px;font-size:15px;line-height:1.5;color:#4F5A63}
-.login-stage .seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid #1C1F22;border-radius:4px;overflow:hidden;margin-bottom:18px}
-.login-stage .seg button{margin:0;border-radius:0;background:transparent;color:#1C1F22;font-weight:600;min-height:44px;padding:8px 10px}
-.login-stage .seg button[aria-selected="true"]{background:#1C1F22;color:#FBFAF7}
-.login-stage .seg button+button{border-left:1px solid #1C1F22}
-.login-stage label{color:#4F5A63;font-size:14px;margin:14px 0 6px}
-.login-stage .phone-field{max-width:none}
-.login-stage input{background:#fff;border:1px solid rgba(28,31,34,.25);border-radius:4px;color:#1C1F22;font-size:16px;min-height:46px}
-.login-stage .phone-field .prefix{background:#EEF0F2;border:1px solid rgba(28,31,34,.25);border-right:0;border-radius:4px 0 0 4px;color:#1C1F22;font-size:16px}
-.login-stage .phone-field input{border-radius:0 4px 4px 0}
-.login-stage button.primary{margin-top:14px;width:100%;min-height:48px;background:#1C1F22;color:#FBFAF7;border-radius:4px;font-size:16px;font-weight:600}
-.login-stage #otp-status{margin:12px 0 0;font-size:14px;color:#4F5A63}
-.login-stage .err{color:#B3261E;font-size:14px;margin:12px 0 0;min-height:1em}
-.login-stage #gsi-button{min-height:44px;display:flex;justify-content:center}
-.login-stage :focus-visible{outline:3px solid #D64531;outline-offset:2px}
-@media (prefers-reduced-motion: reduce){.login-stage .rec.live .dot{animation:none}.login-stage.flash::after{display:none}}
+/* ---------- Sign-in: split layout (approved design) ---------- */
+main:has(#view-login:not(.hidden)){max-width:none;padding:0}
+#view-login{display:grid;grid-template-columns:1fr;min-height:calc(100vh - 70px);background:#F3F8FB;color:#0F2633;font-family:Figtree,"Noto Sans",system-ui,sans-serif;line-height:1.5}
+#view-login button{font:inherit;cursor:pointer}
+#view-login .li-hero{background:#1088C0;color:#fff;padding:28px 24px;display:flex;flex-direction:column;gap:20px;justify-content:space-between}
+#view-login .li-hero h1{margin:0;font-size:30px;line-height:1.15;font-weight:800;max-width:14ch}
+#view-login .li-hero p{margin:10px 0 0;opacity:.92;max-width:34ch;font-size:16px}
+#view-login .li-cam{background:#0F2633;border-radius:18px;padding:12px;max-width:340px;width:100%}
+#view-login .li-screen{position:relative;aspect-ratio:16/9;border-radius:10px;background:#8FC7E3;overflow:hidden}
+#view-login .li-screen svg{width:100%;height:100%;display:block}
+#view-login .li-rec{position:absolute;left:10px;top:10px;color:#fff;font-size:13px;font-weight:700;background:rgba(15,38,51,.7);padding:4px 8px;border-radius:6px;display:flex;gap:6px;align-items:center;font-variant-numeric:tabular-nums}
+#view-login .li-rec i{width:8px;height:8px;border-radius:50%;background:#FF5A4E;animation:li-pulse 1.4s ease-in-out infinite}
+@keyframes li-pulse{0%,100%{opacity:1}50%{opacity:.25}}
+#view-login .li-panel{padding:26px 20px 34px;display:flex;flex-direction:column;gap:16px}
+#view-login .li-panel h2{margin:0;font-size:28px;font-weight:800;color:#0F2633}
+#view-login .li-lead{margin:-8px 0 0;color:#557080}
+#view-login .li-seg{display:grid;grid-template-columns:1fr 1fr;background:#E7F1F7;border-radius:14px;padding:4px;gap:4px}
+#view-login .li-seg button{margin:0;border:0;border-radius:11px;min-height:44px;background:transparent;color:#557080;font-weight:700}
+#view-login .li-seg button[aria-selected="true"]{background:#fff;color:#0F2633;box-shadow:0 1px 2px rgba(15,38,51,.12)}
+#view-login .li-label{display:block;margin:0;font-size:15px;color:#557080;font-weight:600}
+#view-login .li-field{display:flex;align-items:center;border:2px solid #D5E3EB;border-radius:14px;background:#fff;overflow:hidden;margin-top:6px}
+#view-login .li-field:focus-within{border-color:#1088C0;box-shadow:0 0 0 4px rgba(16,136,192,.18)}
+#view-login .li-field span{padding:0 14px;color:#557080;font-weight:600;border-right:2px solid #D5E3EB;line-height:52px}
+#view-login .li-field input{flex:1;min-width:0;border:0;outline:0;min-height:52px;padding:0 14px;font-size:18px;background:transparent;color:#0F2633;border-radius:0}
+#view-login .li-btn{display:block;width:100%;min-height:52px;margin:14px 0 0;border:0;border-radius:14px;background:#1088C0;color:#fff;font-weight:700;font-size:17px}
+#view-login .li-btn:disabled{opacity:.6;cursor:wait}
+#view-login .li-btn.ghost{background:#fff;color:#0B5A85;border:2px solid #1088C0;min-height:46px;font-size:16px}
+#view-login .li-note{background:#E7F5EE;border-radius:14px;padding:12px 14px;font-size:15px;color:#1B5E42;margin:0}
+#view-login .li-steps{display:flex;gap:6px}
+#view-login .li-steps i{flex:1;height:6px;border-radius:99px;background:#1088C0}
+#view-login .li-steps i.off{background:#D5E3EB}
+#view-login .li-num{margin:0;font-size:22px;font-weight:800}
+#view-login .li-hint{margin:-8px 0 0;color:#557080;font-size:15px}
+#view-login .li-code{position:relative;display:flex;gap:8px;justify-content:space-between;margin-top:6px}
+#view-login .li-cbox{flex:1;max-width:56px;height:62px;border:2px solid #D5E3EB;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;background:#fff;color:#0F2633}
+#view-login .li-cbox.on{border-color:#1088C0}
+#view-login .li-cbox.cur{border-color:#1088C0;box-shadow:0 0 0 4px rgba(16,136,192,.18)}
+#view-login .li-code input{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;font-size:16px;min-height:0}
+#view-login .li-ok{background:#E3F5EC;color:#1B5E42;border-radius:14px;padding:12px 14px;font-size:15px;margin:0}
+#view-login .li-timer{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:#557080}
+#view-login .li-link{margin:0;padding:6px 0;min-height:36px;background:none;border:0;color:#0B5A85;font-weight:700;font-size:15px}
+#view-login .li-link:disabled{color:#557080;cursor:default}
+#view-login .li-err{color:#C8372D;font-size:15px;margin:0;min-height:1em}
+#view-login #gsi-button{display:flex;justify-content:center;min-height:44px}
+#view-login :focus-visible{outline:3px solid #F5B83D;outline-offset:2px}
+@media (min-width:900px){
+ #view-login{grid-template-columns:1.1fr .9fr}
+ #view-login .li-hero{padding:56px 64px}
+ #view-login .li-hero h1{font-size:44px}
+ #view-login .li-panel{justify-content:center;padding:56px 72px;max-width:560px;margin:0 auto;width:100%}
+}
+@media (prefers-reduced-motion: reduce){#view-login .li-rec i{animation:none}}
+
+/* ---------- My products: cards ---------- */
+.pcard{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px}
+.pthumb{background:#E7F3FA;border-radius:12px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;color:#0B5A85}
+.pthumb svg{width:70%;height:auto}
+.pbody h3{margin:0;font-size:17px}
+.pmeta{color:var(--muted);font-size:14px;margin-top:2px;overflow-wrap:anywhere}
+.pbtn{margin:10px 0 0;min-height:42px;padding:0 16px;border-radius:12px;font-weight:700}
+
 </style>
 </head>
 <body>
@@ -152,42 +175,63 @@ button.small{margin-top:8px;padding:8px 14px;min-height:40px}
 <main>
 
   <!-- Sign in -->
-  <section id="view-login" class="login-stage hidden">
-    <div class="scene" aria-hidden="true">
-      <svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice">
-        <rect width="400" height="300" fill="#DCE6EC"/>
-        <rect y="300" width="400" height="300" fill="#2B2F33"/>
-        <polygon points="168,300 232,300 340,600 60,600" fill="#3A4046"/>
-        <line x1="200" y1="330" x2="200" y2="600" stroke="#FBFAF7" stroke-opacity=".6" stroke-width="6" stroke-dasharray="28 36"/>
-      </svg>
-    </div>
-    <div class="rec" id="rec" role="status" aria-live="polite">
-      <span class="dot" aria-hidden="true"></span>
-      <span id="rec-text">Ready to sign in</span>
-      <span class="time" id="rec-time"></span>
-    </div>
-    <div class="login-card">
-      <h2>Sign in</h2>
-      <p class="sub">Sign in to register your BLEAT product and raise a service request.</p>
-      <div class="seg" role="tablist" aria-label="Sign-in method">
-        <button type="button" role="tab" id="tab-google" aria-selected="true" aria-controls="panel-google" data-tab="google">Google</button>
-        <button type="button" role="tab" id="tab-wa" aria-selected="false" aria-controls="otp-box" data-tab="wa">WhatsApp</button>
+  <section id="view-login" class="hidden">
+    <div class="li-hero">
+      <div>
+        <h1>Secure your Drive With BLEAT</h1>
+        <p>Sign in to register your BLEAT product, keep your warranty on record and get help fast.</p>
       </div>
-      <div id="panel-google" role="tabpanel">
-        <div id="gsi-button"></div>
-      </div>
-      <div id="otp-box" class="hidden" role="tabpanel">
-        <label for="otp-phone">WhatsApp number</label>
-        <div class="phone-field"><span class="prefix">+91</span><input id="otp-phone" type="tel" inputmode="numeric" maxlength="10" data-digits placeholder="10 digits" autocomplete="tel-national"></div>
-        <button type="button" id="otp-send" class="primary">Send code on WhatsApp</button>
-        <div id="otp-verify" class="hidden">
-          <label for="otp-code">6-digit code</label>
-          <input id="otp-code" type="text" inputmode="numeric" maxlength="6" data-digits autocomplete="one-time-code" placeholder="123456">
-          <button type="button" id="otp-verify-btn" class="primary">Sign in</button>
+      <div class="li-cam" aria-hidden="true">
+        <div class="li-screen">
+          <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
+            <rect width="320" height="110" fill="#BFE3F4"/>
+            <rect y="110" width="320" height="70" fill="#3B4B55"/>
+            <polygon points="150,110 170,110 250,180 70,180" fill="#4A5B66"/>
+            <line x1="160" y1="120" x2="160" y2="180" stroke="#F3F8FB" stroke-width="4" stroke-dasharray="14 16" opacity=".8"/>
+            <rect x="20" y="80" width="90" height="40" rx="10" fill="#0F2633" opacity=".25"/>
+          </svg>
+          <div class="li-rec"><i></i>REC <span id="rec-time"></span></div>
         </div>
-        <p id="otp-status"></p>
       </div>
-      <p class="err" id="login-err"></p>
+    </div>
+    <div class="li-panel">
+      <h2>Sign in</h2>
+      <p class="li-lead">Use WhatsApp or Google. No password to remember.</p>
+      <div class="li-seg" role="tablist" aria-label="Sign-in method">
+        <button type="button" role="tab" id="tab-wa" aria-selected="true" aria-controls="otp-box" data-tab="wa">WhatsApp</button>
+        <button type="button" role="tab" id="tab-google" aria-selected="false" aria-controls="panel-google" data-tab="google">Google</button>
+      </div>
+
+      <div id="otp-box" role="tabpanel">
+        <div id="otp-phone-step">
+          <label class="li-label" for="otp-phone">WhatsApp number</label>
+          <div class="li-field"><span>+91</span><input id="otp-phone" type="tel" inputmode="numeric" maxlength="10" data-digits placeholder="10-digit mobile number" autocomplete="tel-national"></div>
+          <button type="button" id="otp-send" class="li-btn">Send code on WhatsApp</button>
+        </div>
+
+        <div id="otp-verify" class="hidden">
+          <div class="li-steps" aria-hidden="true"><i></i><i class="off"></i></div>
+          <p class="li-num">Enter your code</p>
+          <p class="li-hint">We sent a 6-digit code to <span id="otp-sent-to"></span> on WhatsApp.</p>
+          <div class="li-code">
+            <div class="li-cbox" aria-hidden="true"></div><div class="li-cbox" aria-hidden="true"></div><div class="li-cbox" aria-hidden="true"></div>
+            <div class="li-cbox" aria-hidden="true"></div><div class="li-cbox" aria-hidden="true"></div><div class="li-cbox" aria-hidden="true"></div>
+            <input id="otp-code" type="text" inputmode="numeric" maxlength="6" data-digits autocomplete="one-time-code" aria-label="6-digit code">
+          </div>
+          <p id="otp-status" class="li-ok"></p>
+          <button type="button" id="otp-verify-btn" class="li-btn">Sign in</button>
+          <div class="li-timer">
+            <span>Didn't get it?</span>
+            <button type="button" id="otp-resend" class="li-link" disabled>Resend code</button>
+          </div>
+          <button type="button" id="otp-change" class="li-btn ghost">Change number</button>
+        </div>
+      </div>
+
+      <div id="panel-google" class="hidden" role="tabpanel"><div id="gsi-button"></div></div>
+
+      <p class="li-note">We only use your number to send a one-time code and to find your products.</p>
+      <p class="li-err" id="login-err"></p>
     </div>
   </section>
 
@@ -414,7 +458,7 @@ document.addEventListener('input', (e) => {
 
 function showView(id) {
   ['view-login', 'view-profile', 'view-products', 'view-service', 'view-me'].forEach((v) => $('#' + v).classList.toggle('hidden', v !== id));
-  if (id === 'view-login') { recSet('Ready to sign in', false); $('#view-login').classList.remove('flash'); }
+  if (id === 'view-login') $('#login-err').textContent = '';
 }
 
 function toast(msg) {
@@ -426,6 +470,7 @@ function toast(msg) {
 
 // ---------- Google sign-in ----------
 let gsiLoaded = false;
+let gsiRendered = false;
 function googleReady() {
   if (gsiLoaded) return;
   gsiLoaded = true;
@@ -434,63 +479,113 @@ function googleReady() {
     callback: async (resp) => {
       try {
         await api('/api/auth/google', { method: 'POST', body: JSON.stringify({ credential: resp.credential }) });
-        recSaved();
-        await new Promise((r) => setTimeout(r, 500));
         await start();
       } catch (err) {
         $('#login-err').textContent = errText(err);
       }
     },
   });
-  google.accounts.id.renderButton($('#gsi-button'), { theme: 'outline', size: 'large', text: 'continue_with', width: 280 });
+  if (!$('#panel-google').classList.contains('hidden')) renderGsiButton();
+}
+// The Google button is drawn when its tab opens, so it fits the width of the panel.
+function renderGsiButton() {
+  if (!gsiLoaded || gsiRendered) return;
+  gsiRendered = true;
+  const width = Math.min(300, $('#gsi-button').clientWidth || 280);
+  google.accounts.id.renderButton($('#gsi-button'), { theme: 'outline', size: 'large', text: 'continue_with', width });
 }
 
-// ---------- Sign-in screen: recording overlay and method tabs ----------
-function recSet(text, live) {
-  const rec = $('#rec');
-  rec.classList.remove('saved');
-  rec.classList.toggle('live', !!live);
-  $('#rec-text').textContent = text;
-}
-function recSaved() {
-  const rec = $('#rec');
-  rec.classList.remove('live');
-  rec.classList.add('saved');
-  $('#rec-text').textContent = 'Saved';
-  $('#view-login').classList.add('flash');
-}
+// ---------- Sign-in screen: method tabs and live clock ----------
 function showLoginTab(name) {
-  const google = name === 'google';
-  $('#tab-google').setAttribute('aria-selected', String(google));
-  $('#tab-wa').setAttribute('aria-selected', String(!google));
-  $('#panel-google').classList.toggle('hidden', !google);
-  $('#otp-box').classList.toggle('hidden', google);
+  const isGoogle = name === 'google';
+  $('#tab-google').setAttribute('aria-selected', String(isGoogle));
+  $('#tab-wa').setAttribute('aria-selected', String(!isGoogle));
+  $('#panel-google').classList.toggle('hidden', !isGoogle);
+  $('#otp-box').classList.toggle('hidden', isGoogle);
   $('#login-err').textContent = '';
-  if (!google) $('#otp-phone').focus();
+  if (isGoogle) renderGsiButton();
+  else if (!$('#otp-phone-step').classList.contains('hidden')) $('#otp-phone').focus();
 }
 $('#tab-google').addEventListener('click', () => showLoginTab('google'));
 $('#tab-wa').addEventListener('click', () => showLoginTab('wa'));
-$('#rec-time').textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' });
+function tickRecClock() {
+  const el = $('#rec-time');
+  if (el) el.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kolkata' });
+}
+tickRecClock();
+setInterval(tickRecClock, 1000);
 
 // ---------- WhatsApp OTP sign-in ----------
+const OTP_RESEND_SECS = 30;
 let otpPhone = '';
+let resendTimer = null;
+
+function paintCodeBoxes(digits) {
+  document.querySelectorAll('#otp-verify .li-cbox').forEach((box, i) => {
+    box.textContent = digits[i] || '';
+    box.classList.toggle('on', i < digits.length);
+    box.classList.toggle('cur', digits.length < 6 && i === digits.length);
+  });
+}
+function startResendTimer() {
+  const btn = $('#otp-resend');
+  let left = OTP_RESEND_SECS;
+  clearInterval(resendTimer);
+  btn.disabled = true;
+  const paint = () => { btn.textContent = left > 0 ? `Resend in 0:${String(left).padStart(2, '0')}` : 'Resend code'; };
+  paint();
+  resendTimer = setInterval(() => {
+    left -= 1;
+    if (left <= 0) { clearInterval(resendTimer); btn.disabled = false; }
+    paint();
+  }, 1000);
+}
+function showCodeStep(on) {
+  $('#otp-phone-step').classList.toggle('hidden', on);
+  $('#otp-verify').classList.toggle('hidden', !on);
+}
+async function sendOtp(phone) {
+  await api('/api/auth/otp/send', { method: 'POST', body: JSON.stringify({ phone }) });
+  otpPhone = phone;
+  $('#otp-sent-to').textContent = '+91 ••••••' + phone.slice(-4);
+  $('#otp-code').value = '';
+  paintCodeBoxes('');
+  $('#otp-status').textContent = 'Code sent. It expires in 5 minutes.';
+  showCodeStep(true);
+  startResendTimer();
+  $('#otp-code').focus();
+}
 $('#otp-send').addEventListener('click', async () => {
   $('#login-err').textContent = '';
   const btn = $('#otp-send');
   btn.disabled = true;
   try {
-    const phone = $('#otp-phone').value.trim();
-    await api('/api/auth/otp/send', { method: 'POST', body: JSON.stringify({ phone }) });
-    otpPhone = phone;
-    $('#otp-verify').classList.remove('hidden');
-    $('#otp-status').textContent = 'Code sent. Enter the 6-digit code. It expires in 5 minutes.';
-    recSet('Waiting for code', true);
-    $('#otp-code').focus();
+    await sendOtp($('#otp-phone').value.trim());
   } catch (err) {
     $('#login-err').textContent = errText(err);
   } finally {
     btn.disabled = false;
   }
+});
+$('#otp-resend').addEventListener('click', async () => {
+  $('#login-err').textContent = '';
+  try {
+    await sendOtp(otpPhone);
+  } catch (err) {
+    $('#login-err').textContent = errText(err);
+  }
+});
+$('#otp-change').addEventListener('click', () => {
+  clearInterval(resendTimer);
+  showCodeStep(false);
+  $('#login-err').textContent = '';
+  $('#otp-phone').focus();
+});
+$('#otp-code').addEventListener('input', () => {
+  const digits = $('#otp-code').value.replace(/\D/g, '').slice(0, 6);
+  $('#otp-code').value = digits;
+  paintCodeBoxes(digits);
+  if (digits.length === 6) $('#otp-verify-btn').click();
 });
 $('#otp-verify-btn').addEventListener('click', async () => {
   $('#login-err').textContent = '';
@@ -498,8 +593,6 @@ $('#otp-verify-btn').addEventListener('click', async () => {
   btn.disabled = true;
   try {
     await api('/api/auth/otp/verify', { method: 'POST', body: JSON.stringify({ phone: otpPhone, code: $('#otp-code').value.trim() }) });
-    recSaved();
-    await new Promise((r) => setTimeout(r, 500));
     await start();
   } catch (err) {
     $('#login-err').textContent = errText(err);
@@ -591,21 +684,34 @@ async function loadApp() {
   renderTickets(tickets.tickets);
 }
 
+const PRODUCT_ICON = '<svg viewBox="0 0 120 80" aria-hidden="true"><rect x="8" y="10" width="104" height="60" rx="12" fill="#0F2633"/><circle cx="60" cy="40" r="20" fill="#1088C0"/><circle cx="60" cy="40" r="9" fill="#0F2633"/><circle cx="90" cy="22" r="4" fill="#FF5A4E"/></svg>';
 function renderProducts(list) {
   $('#product-list').innerHTML = list.length
     ? list.map((p) => `
-        <div class="item">
-          <strong>${esc(p.model_name)}</strong> <span class="muted">(${esc(p.category)})</span><br>
-          <span class="muted">${esc(t('b_bought_from').replace('{date}', p.purchase_date).replace('{place}', p.place_of_purchase))}${p.dealer_name ? ' – ' + esc(p.dealer_name) : ''}${p.order_no ? ' · ' + esc(t('b_order_no').replace('{n}', p.order_no)) : ''}</span><br>
-          <span class="muted">${esc(t('b_serial_no').replace('{n}', p.serial_no))}</span><br>
-          <span class="muted">${esc(t('b_registered_on'))}: ${esc(new Date(p.created_at).toLocaleDateString('en-IN'))}</span>
-        </div>`).join('')
+        <article class="pcard">
+          <div class="pthumb">${PRODUCT_ICON}</div>
+          <div class="pbody">
+            <h3>${esc(p.model_name)}</h3>
+            <div class="pmeta">${esc(p.category)} · ${esc(t('b_serial_no').replace('{n}', p.serial_no))}</div>
+            <div class="pmeta">${esc(t('b_bought_from').replace('{date}', p.purchase_date).replace('{place}', p.place_of_purchase))}${p.dealer_name ? ' – ' + esc(p.dealer_name) : ''}${p.order_no ? ' · ' + esc(t('b_order_no').replace('{n}', p.order_no)) : ''}</div>
+            <div class="pmeta">${esc(t('b_registered_on'))}: ${esc(new Date(p.created_at).toLocaleDateString('en-IN'))}</div>
+            <button type="button" class="pbtn" data-help="${esc(p.id)}">Get help</button>
+          </div>
+        </article>`).join('')
     : '<p class="muted">No products registered yet.</p>';
 
   $('#t-product').innerHTML = list.length
     ? list.map((p) => `<option value="${p.id}">${esc(p.model_name)} (${esc(p.category)})</option>`).join('')
     : `<option value="">${esc(t('b_register_first'))}</option>`;
 }
+// "Get help" opens the service form with this product already chosen.
+$('#product-list').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-help]');
+  if (!btn) return;
+  $('#t-product').value = btn.dataset.help;
+  showView('view-service');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
 function renderTickets(list) {
   $('#ticket-list').innerHTML = list.length
