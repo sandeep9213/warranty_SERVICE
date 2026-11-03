@@ -119,11 +119,10 @@ button.small{margin-top:8px;padding:8px 14px;min-height:40px}
   <!-- Sign in -->
   <section id="view-login" class="card hidden">
     <h2>Sign in</h2>
-    <p class="muted">Sign in with Google to register your BLEAT product and raise a service request.</p>
+    <p class="muted">Sign in with Google or WhatsApp to register your BLEAT product and raise a service request.</p>
     <div id="gsi-button" style="margin-top:16px"></div>
-    <!-- WhatsApp OTP sign-in is hidden for now; re-enable by removing the class below. -->
-    <div class="or-divider hidden"><span>or</span></div>
-    <div id="otp-box" class="hidden">
+    <div class="or-divider"><span>or</span></div>
+    <div id="otp-box">
       <label for="otp-phone">WhatsApp mobile number</label>
       <div class="phone-field"><span class="prefix">+91</span><input id="otp-phone" type="tel" inputmode="numeric" maxlength="10" data-digits placeholder="10 digits" autocomplete="tel-national"></div>
       <button type="button" id="otp-send">Send code on WhatsApp</button>
