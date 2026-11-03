@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BLEAT Service and Warranty</title>
 <script src="https://accounts.google.com/gsi/client" async defer onload="googleReady()"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..90,600..800&family=Noto+Sans:wght@400;600&display=swap">
 <style>
 :root{--bg:#f6f7f9;--card:#ffffff;--text:#1d2330;--muted:#6b7280;--brand:#0b6cff;--err:#c62828;--line:#dfe3ea;--ok:#2e7d32}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1218;--card:#171c25;--text:#e8ebf0;--muted:#9aa3b2;--brand:#4d9bff;--err:#ff6b6b;--line:#2a3140;--ok:#66bb6a}}
@@ -91,6 +94,38 @@ button.small{margin-top:8px;padding:8px 14px;min-height:40px}
 .phone-field input { border-radius: 0 6px 6px 0; }
 #otp-verify { margin-top: 12px; }
 #otp-box button { margin-top: 10px; }
+
+/* ---------- Sign-in screen: daylight road scene with recording overlay ---------- */
+.login-stage{position:relative;min-height:calc(100vh - 64px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 16px 40px;overflow:hidden;background:#2B2F33;font-family:"Noto Sans",system-ui,sans-serif;color:#1C1F22}
+.login-stage .scene{position:absolute;inset:0;z-index:0}
+#view-login.login-stage{width:100vw;max-width:none;position:relative;left:50%;transform:translateX(-50%);margin:-16px 0 -16px}
+.login-stage .scene svg{width:100%;height:100%;display:block}
+.login-stage .rec{position:absolute;z-index:1;top:14px;left:14px;display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(28,31,34,.8);color:#FBFAF7;border-radius:4px;font-size:13px;font-variant-numeric:tabular-nums}
+.login-stage .rec .dot{width:9px;height:9px;border-radius:50%;background:#D64531}
+.login-stage .rec.live .dot{animation:rec-pulse 1.4s ease-in-out infinite}
+.login-stage .rec.saved .dot{background:#7BC47F}
+.login-stage .rec .time{opacity:.75}
+@keyframes rec-pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.login-stage.flash::after{content:"";position:absolute;inset:0;background:#FBFAF7;z-index:2;pointer-events:none;animation:shutter .45s ease-out forwards}
+@keyframes shutter{from{opacity:.85}to{opacity:0}}
+.login-stage .login-card{position:relative;z-index:1;width:100%;max-width:400px;background:#FBFAF7;color:#1C1F22;border:1px solid rgba(28,31,34,.12);border-radius:4px;padding:26px 22px 22px}
+.login-stage h2{font-family:Archivo,"Noto Sans",sans-serif;font-stretch:80%;font-weight:800;font-size:32px;line-height:1.1;margin:0 0 6px;letter-spacing:-.01em;color:#1C1F22}
+.login-stage .sub{margin:0 0 20px;font-size:15px;line-height:1.5;color:#4F5A63}
+.login-stage .seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid #1C1F22;border-radius:4px;overflow:hidden;margin-bottom:18px}
+.login-stage .seg button{margin:0;border-radius:0;background:transparent;color:#1C1F22;font-weight:600;min-height:44px;padding:8px 10px}
+.login-stage .seg button[aria-selected="true"]{background:#1C1F22;color:#FBFAF7}
+.login-stage .seg button+button{border-left:1px solid #1C1F22}
+.login-stage label{color:#4F5A63;font-size:14px;margin:14px 0 6px}
+.login-stage .phone-field{max-width:none}
+.login-stage input{background:#fff;border:1px solid rgba(28,31,34,.25);border-radius:4px;color:#1C1F22;font-size:16px;min-height:46px}
+.login-stage .phone-field .prefix{background:#EEF0F2;border:1px solid rgba(28,31,34,.25);border-right:0;border-radius:4px 0 0 4px;color:#1C1F22;font-size:16px}
+.login-stage .phone-field input{border-radius:0 4px 4px 0}
+.login-stage button.primary{margin-top:14px;width:100%;min-height:48px;background:#1C1F22;color:#FBFAF7;border-radius:4px;font-size:16px;font-weight:600}
+.login-stage #otp-status{margin:12px 0 0;font-size:14px;color:#4F5A63}
+.login-stage .err{color:#B3261E;font-size:14px;margin:12px 0 0;min-height:1em}
+.login-stage #gsi-button{min-height:44px;display:flex;justify-content:center}
+.login-stage :focus-visible{outline:3px solid #D64531;outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.login-stage .rec.live .dot{animation:none}.login-stage.flash::after{display:none}}
 </style>
 </head>
 <body>
@@ -117,23 +152,43 @@ button.small{margin-top:8px;padding:8px 14px;min-height:40px}
 <main>
 
   <!-- Sign in -->
-  <section id="view-login" class="card hidden">
-    <h2>Sign in</h2>
-    <p class="muted">Sign in with Google or WhatsApp to register your BLEAT product and raise a service request.</p>
-    <div id="gsi-button" style="margin-top:16px"></div>
-    <div class="or-divider"><span>or</span></div>
-    <div id="otp-box">
-      <label for="otp-phone">WhatsApp mobile number</label>
-      <div class="phone-field"><span class="prefix">+91</span><input id="otp-phone" type="tel" inputmode="numeric" maxlength="10" data-digits placeholder="10 digits" autocomplete="tel-national"></div>
-      <button type="button" id="otp-send">Send code on WhatsApp</button>
-      <div id="otp-verify" class="hidden">
-        <label for="otp-code">6-digit code</label>
-        <input id="otp-code" type="text" inputmode="numeric" maxlength="6" data-digits autocomplete="one-time-code" placeholder="123456">
-        <button type="button" id="otp-verify-btn">Verify and sign in</button>
-      </div>
-      <p class="muted" id="otp-status"></p>
+  <section id="view-login" class="login-stage hidden">
+    <div class="scene" aria-hidden="true">
+      <svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice">
+        <rect width="400" height="300" fill="#DCE6EC"/>
+        <rect y="300" width="400" height="300" fill="#2B2F33"/>
+        <polygon points="168,300 232,300 340,600 60,600" fill="#3A4046"/>
+        <line x1="200" y1="330" x2="200" y2="600" stroke="#FBFAF7" stroke-opacity=".6" stroke-width="6" stroke-dasharray="28 36"/>
+      </svg>
     </div>
-    <p class="err" id="login-err"></p>
+    <div class="rec" id="rec" role="status" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span>
+      <span id="rec-text">Ready to sign in</span>
+      <span class="time" id="rec-time"></span>
+    </div>
+    <div class="login-card">
+      <h2>Sign in</h2>
+      <p class="sub">Sign in to register your BLEAT product and raise a service request.</p>
+      <div class="seg" role="tablist" aria-label="Sign-in method">
+        <button type="button" role="tab" id="tab-google" aria-selected="true" aria-controls="panel-google" data-tab="google">Google</button>
+        <button type="button" role="tab" id="tab-wa" aria-selected="false" aria-controls="otp-box" data-tab="wa">WhatsApp</button>
+      </div>
+      <div id="panel-google" role="tabpanel">
+        <div id="gsi-button"></div>
+      </div>
+      <div id="otp-box" class="hidden" role="tabpanel">
+        <label for="otp-phone">WhatsApp number</label>
+        <div class="phone-field"><span class="prefix">+91</span><input id="otp-phone" type="tel" inputmode="numeric" maxlength="10" data-digits placeholder="10 digits" autocomplete="tel-national"></div>
+        <button type="button" id="otp-send" class="primary">Send code on WhatsApp</button>
+        <div id="otp-verify" class="hidden">
+          <label for="otp-code">6-digit code</label>
+          <input id="otp-code" type="text" inputmode="numeric" maxlength="6" data-digits autocomplete="one-time-code" placeholder="123456">
+          <button type="button" id="otp-verify-btn" class="primary">Sign in</button>
+        </div>
+        <p id="otp-status"></p>
+      </div>
+      <p class="err" id="login-err"></p>
+    </div>
   </section>
 
   <!-- My profile (read-only view) -->
@@ -359,6 +414,7 @@ document.addEventListener('input', (e) => {
 
 function showView(id) {
   ['view-login', 'view-profile', 'view-products', 'view-service', 'view-me'].forEach((v) => $('#' + v).classList.toggle('hidden', v !== id));
+  if (id === 'view-login') { recSet('Ready to sign in', false); $('#view-login').classList.remove('flash'); }
 }
 
 function toast(msg) {
@@ -378,6 +434,8 @@ function googleReady() {
     callback: async (resp) => {
       try {
         await api('/api/auth/google', { method: 'POST', body: JSON.stringify({ credential: resp.credential }) });
+        recSaved();
+        await new Promise((r) => setTimeout(r, 500));
         await start();
       } catch (err) {
         $('#login-err').textContent = errText(err);
@@ -386,6 +444,33 @@ function googleReady() {
   });
   google.accounts.id.renderButton($('#gsi-button'), { theme: 'outline', size: 'large', text: 'continue_with', width: 280 });
 }
+
+// ---------- Sign-in screen: recording overlay and method tabs ----------
+function recSet(text, live) {
+  const rec = $('#rec');
+  rec.classList.remove('saved');
+  rec.classList.toggle('live', !!live);
+  $('#rec-text').textContent = text;
+}
+function recSaved() {
+  const rec = $('#rec');
+  rec.classList.remove('live');
+  rec.classList.add('saved');
+  $('#rec-text').textContent = 'Saved';
+  $('#view-login').classList.add('flash');
+}
+function showLoginTab(name) {
+  const google = name === 'google';
+  $('#tab-google').setAttribute('aria-selected', String(google));
+  $('#tab-wa').setAttribute('aria-selected', String(!google));
+  $('#panel-google').classList.toggle('hidden', !google);
+  $('#otp-box').classList.toggle('hidden', google);
+  $('#login-err').textContent = '';
+  if (!google) $('#otp-phone').focus();
+}
+$('#tab-google').addEventListener('click', () => showLoginTab('google'));
+$('#tab-wa').addEventListener('click', () => showLoginTab('wa'));
+$('#rec-time').textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' });
 
 // ---------- WhatsApp OTP sign-in ----------
 let otpPhone = '';
@@ -398,7 +483,8 @@ $('#otp-send').addEventListener('click', async () => {
     await api('/api/auth/otp/send', { method: 'POST', body: JSON.stringify({ phone }) });
     otpPhone = phone;
     $('#otp-verify').classList.remove('hidden');
-    $('#otp-status').textContent = 'We sent a 6-digit code to your WhatsApp. It expires in 5 minutes.';
+    $('#otp-status').textContent = 'Code sent. Enter the 6-digit code. It expires in 5 minutes.';
+    recSet('Waiting for code', true);
     $('#otp-code').focus();
   } catch (err) {
     $('#login-err').textContent = errText(err);
@@ -412,6 +498,8 @@ $('#otp-verify-btn').addEventListener('click', async () => {
   btn.disabled = true;
   try {
     await api('/api/auth/otp/verify', { method: 'POST', body: JSON.stringify({ phone: otpPhone, code: $('#otp-code').value.trim() }) });
+    recSaved();
+    await new Promise((r) => setTimeout(r, 500));
     await start();
   } catch (err) {
     $('#login-err').textContent = errText(err);
