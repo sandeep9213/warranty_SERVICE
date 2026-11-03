@@ -493,6 +493,15 @@ function renderGsiButton() {
   el.innerHTML = '';
   const width = Math.min(300, el.clientWidth || 280);
   google.accounts.id.renderButton(el, { theme: 'outline', size: 'large', text: 'continue_with', width });
+  checkGsiDrawn();
+}
+// If Google's button never appears (blocked script, or the browser blocks its frame), say so instead of showing an empty panel.
+function checkGsiDrawn() {
+  setTimeout(() => {
+    if (!$('#panel-google').classList.contains('hidden') && !$('#gsi-button iframe')) {
+      $('#login-err').textContent = 'Google sign-in did not load in this browser. Please sign in with WhatsApp, or try Chrome or Edge.';
+    }
+  }, 4000);
 }
 
 // ---------- Sign-in screen: method tabs and live clock ----------
