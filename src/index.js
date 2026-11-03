@@ -195,7 +195,7 @@ async function sendWhatsAppOtp(env, phone, code) {
         language: { code: env.WHATSAPP_OTP_LANG || 'en' },
         components: [
           { type: 'body', parameters: [{ type: 'text', text: code }] },
-          { type: 'button', sub_type: 'copy_code', index: '0', parameters: [{ type: 'text', text: code }] },
+          { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: code }] },
         ],
       },
     }),
