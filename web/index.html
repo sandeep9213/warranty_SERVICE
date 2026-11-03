@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BLEAT Service and Warranty</title>
-<script src="https://accounts.google.com/gsi/client" async defer onload="googleReady()"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@600;700;800&family=Noto+Sans:wght@400;600;700&display=swap">
@@ -1067,6 +1067,11 @@ function buildLangBox() {
 
 // Google script may load before or after this line.
 document.addEventListener("DOMContentLoaded", () => { translatePage(); buildLangBox(); start(); });
+// Google's library can finish loading before this page's code has run, so wait for both.
+(function waitForGsi(tries) {
+  if (window.google && google.accounts && google.accounts.id) googleReady();
+  else if (tries < 100) setTimeout(() => waitForGsi(tries + 1), 100);
+})(0);
 </script>
 </body>
 </html>
