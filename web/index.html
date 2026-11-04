@@ -95,12 +95,10 @@ main:has(#view-login:not(.hidden)){max-width:none;padding:0}
 #view-login .li-hero{background:#1088C0;color:#fff;padding:28px 24px;display:flex;flex-direction:column;gap:20px;justify-content:space-between}
 #view-login .li-hero h1{margin:0;font-size:30px;line-height:1.15;font-weight:800;max-width:14ch}
 #view-login .li-hero p{margin:10px 0 0;opacity:.92;max-width:34ch;font-size:16px}
-#view-login .li-cam{background:#0F2633;border-radius:18px;padding:12px;max-width:340px;width:100%}
-#view-login .li-screen{position:relative;aspect-ratio:16/9;border-radius:10px;background:#8FC7E3;overflow:hidden}
-#view-login .li-screen svg{width:100%;height:100%;display:block}
-#view-login .li-rec{position:absolute;left:10px;top:10px;color:#fff;font-size:13px;font-weight:700;background:rgba(15,38,51,.7);padding:4px 8px;border-radius:6px;display:flex;gap:6px;align-items:center;font-variant-numeric:tabular-nums}
-#view-login .li-rec i{width:8px;height:8px;border-radius:50%;background:#FF5A4E;animation:li-pulse 1.4s ease-in-out infinite}
-@keyframes li-pulse{0%,100%{opacity:1}50%{opacity:.25}}
+#view-login .li-cam{position:relative;width:100%;max-width:440px;container-type:inline-size;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(15,38,51,.25)}
+#view-login .li-cam img{display:block;width:100%;height:auto}
+/* Covers the photo's own timestamp and shows the live time in the same place */
+#view-login .li-clock{position:absolute;left:13.5%;top:82%;width:32%;height:8%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.9);color:#fff;font-family:"Noto Sans",system-ui,sans-serif;font-weight:600;font-size:2.4cqw;font-variant-numeric:tabular-nums;white-space:nowrap;border-radius:2px}
 #view-login .li-panel{padding:26px 20px 34px;display:flex;flex-direction:column;gap:16px}
 #view-login .li-panel h2{margin:0;font-size:28px;font-weight:800;color:#0F2633}
 #view-login .li-lead{margin:-8px 0 0;color:#557080}
@@ -182,16 +180,8 @@ main:has(#view-login:not(.hidden)){max-width:none;padding:0}
         <p>Sign in to register your BLEAT product, keep your warranty on record and get help fast.</p>
       </div>
       <div class="li-cam" aria-hidden="true">
-        <div class="li-screen">
-          <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
-            <rect width="320" height="110" fill="#BFE3F4"/>
-            <rect y="110" width="320" height="70" fill="#3B4B55"/>
-            <polygon points="150,110 170,110 250,180 70,180" fill="#4A5B66"/>
-            <line x1="160" y1="120" x2="160" y2="180" stroke="#F3F8FB" stroke-width="4" stroke-dasharray="14 16" opacity=".8"/>
-            <rect x="20" y="80" width="90" height="40" rx="10" fill="#0F2633" opacity=".25"/>
-          </svg>
-          <div class="li-rec"><i></i>REC <span id="rec-time"></span></div>
-        </div>
+        <img src="dashcam.jpg" alt="" width="696" height="414">
+        <div class="li-clock" id="rec-time"></div>
       </div>
     </div>
     <div class="li-panel">
@@ -519,7 +509,10 @@ $('#tab-google').addEventListener('click', () => showLoginTab('google'));
 $('#tab-wa').addEventListener('click', () => showLoginTab('wa'));
 function tickRecClock() {
   const el = $('#rec-time');
-  if (el) el.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kolkata' });
+  if (!el) return;
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  el.textContent = `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 tickRecClock();
 setInterval(tickRecClock, 1000);
