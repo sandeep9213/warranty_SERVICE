@@ -92,10 +92,10 @@ button.small{margin-top:8px;padding:8px 14px;min-height:40px}
 main:has(#view-login:not(.hidden)){max-width:none;padding:0}
 #view-login{display:grid;grid-template-columns:1fr;min-height:calc(100vh - 70px);background:#F3F8FB;color:#0F2633;font-family:Figtree,"Noto Sans",system-ui,sans-serif;line-height:1.5}
 #view-login button{font:inherit;cursor:pointer}
-#view-login .li-hero{background:#1088C0;color:#fff;padding:28px 24px;display:flex;flex-direction:column;gap:20px;justify-content:space-between}
+#view-login .li-hero{background:#1088C0;color:#fff;padding:28px 24px 32px;display:flex;flex-direction:column;gap:8px;justify-content:flex-start}
 #view-login .li-hero h1{margin:0;font-size:30px;line-height:1.15;font-weight:800;max-width:14ch}
 #view-login .li-hero p{margin:10px 0 0;opacity:.92;max-width:34ch;font-size:16px}
-#view-login .li-cam{position:relative;width:100%;max-width:440px;container-type:inline-size;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(15,38,51,.25)}
+#view-login .li-cam{position:relative;width:100%;max-width:440px;container-type:inline-size}
 #view-login .li-cam img{display:block;width:100%;height:auto}
 /* Covers the photo's own timestamp and shows the live time in the same place */
 #view-login .li-clock{position:absolute;left:13.5%;top:82%;width:32%;height:8%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.9);color:#fff;font-family:"Noto Sans",system-ui,sans-serif;font-weight:600;font-size:2.4cqw;font-variant-numeric:tabular-nums;white-space:nowrap;border-radius:2px}
@@ -180,7 +180,7 @@ main:has(#view-login:not(.hidden)){max-width:none;padding:0}
         <p>Sign in to register your BLEAT product, keep your warranty on record and get help fast.</p>
       </div>
       <div class="li-cam" aria-hidden="true">
-        <img src="dashcam.jpg" alt="" width="696" height="414">
+        <img src="dashcam.png" alt="" width="696" height="414">
         <div class="li-clock" id="rec-time"></div>
       </div>
     </div>
