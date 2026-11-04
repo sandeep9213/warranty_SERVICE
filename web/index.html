@@ -165,6 +165,10 @@ header #lang-slot select{background:#fff;color:#0F2633;border:0;border-radius:10
   .hdr-mid{order:3;flex:0 0 100%;text-align:left;color:#fff;font-size:15px;font-weight:700;margin-top:8px}
   .hdr-actions{order:2;margin-left:auto}
 }
+/* Sign-in page: the header joins the blue hero so the top of the page reads as one piece */
+body.on-login header{background:#1088C0;box-shadow:none}
+body.on-login header strong{color:#fff}
+body.on-login header .logo{background:#fff}
 </style>
 </head>
 <body>
@@ -467,6 +471,7 @@ document.addEventListener('input', (e) => {
 function showView(id) {
   ['view-login', 'view-profile', 'view-products', 'view-service', 'view-me'].forEach((v) => $('#' + v).classList.toggle('hidden', v !== id));
   if (id === 'view-login') $('#login-err').textContent = '';
+  document.body.classList.toggle('on-login', id === 'view-login');
 }
 
 function toast(msg) {
