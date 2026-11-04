@@ -149,6 +149,22 @@ main:has(#view-login:not(.hidden)){max-width:none;padding:0}
 .pmeta{color:var(--muted);font-size:14px;margin-top:2px;overflow-wrap:anywhere}
 .pbtn{margin:10px 0 0;min-height:42px;padding:0 16px;border-radius:12px;font-weight:700}
 
+/* ---------- Header: brand band (approved design) ---------- */
+header{background:#0B5A85;color:#fff;padding:12px 24px;border-bottom:0;box-shadow:0 3px 0 #1088C0}
+header .logo{height:auto;width:auto;max-height:34px;background:#fff;border-radius:10px;padding:6px 12px;box-sizing:content-box}
+header strong{font-family:Figtree,"Noto Sans",system-ui,sans-serif;font-size:19px;font-weight:800;letter-spacing:-.005em;color:#fff}
+.hdr-mid{color:#fff;font-family:Figtree,"Noto Sans",system-ui,sans-serif;font-weight:700;font-size:14px}
+header .nav button.ghost,header #logout{color:#fff;background:transparent;border:1.5px solid rgba(255,255,255,.6);border-radius:10px}
+header .nav button.ghost:hover,header #logout:hover{background:rgba(255,255,255,.14)}
+header .nav button.ghost:focus-visible,header #logout:focus-visible,header #lang-slot select:focus-visible{outline:3px solid #F5B83D;outline-offset:2px}
+header #lang-slot select{background:#fff;color:#0F2633;border:0;border-radius:10px}
+@media (max-width:640px){
+  header{padding:10px 12px 12px}
+  header .logo{max-height:28px;padding:4px 8px;border-radius:8px}
+  .hdr-top{flex-wrap:wrap}
+  .hdr-mid{order:3;flex:0 0 100%;text-align:left;color:#fff;font-size:15px;font-weight:700;margin-top:8px}
+  .hdr-actions{order:2;margin-left:auto}
+}
 </style>
 </head>
 <body>
