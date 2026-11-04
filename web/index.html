@@ -165,10 +165,15 @@ header #lang-slot select{background:#fff;color:#0F2633;border:0;border-radius:10
   .hdr-mid{order:3;flex:0 0 100%;text-align:left;color:#fff;font-size:15px;font-weight:700;margin-top:8px}
   .hdr-actions{order:2;margin-left:auto}
 }
-/* Sign-in page: the header joins the blue hero so the top of the page reads as one piece */
-body.on-login header{background:#1088C0;box-shadow:none}
+/* Sign-in page: one full-width ink header with an amber rule, separate from the blue hero below */
+body.on-login header{background:#0F2633;color:#fff;box-shadow:0 3px 0 #F5B83D;padding:14px 24px}
 body.on-login header strong{color:#fff}
 body.on-login header .logo{background:#fff}
+body.on-login #lang-slot{margin-left:auto}
+@media (min-width:900px){
+  body.on-login header{padding:16px 32px;gap:16px;justify-content:flex-start}
+  body.on-login header strong{font-size:20px}
+}
 </style>
 </head>
 <body>
